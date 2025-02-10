@@ -16,77 +16,77 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    min-height: 100vh; /* Ensure body takes at least the full viewport height */
+    min-height: 100vh; 
     margin: 0;
-    padding: 2vh; /* Use viewport units for padding */
+    padding: 2vh; 
     box-sizing: border-box;
     font-family: 'Bebas Neue', sans-serif;
     background-color: rgb(0, 217, 255);
     color: black;
-    font-size: clamp(16px, 2.5vw, 24px); /* Responsive font size */
+    font-size: clamp(16px, 2.5vw, 24px); 
 }
 
-/* Flex container for horizontal alignment of sections */
+
 .sections-container {
     display: flex;
     justify-content: flex-start;
     align-items: stretch;
     width: 100%;
-    max-width: 1200px; /* Limit maximum width for larger screens */
-    flex-wrap: wrap; /* Allow wrapping on smaller screens */
-    gap: 2vh; /* Add gap between sections */
+    max-width: 1200px; 
+    flex-wrap: wrap; 
+    gap: 2vh; 
     padding: 0;
 }
 
-/* Styling for each section */
+
 .section {
     border: 2px solid black;
-    padding: 2vh; /* Use viewport units for padding */
+    padding: 2vh; 
     background: white;
-    margin: 1vh; /* Use viewport units for margin */
+    margin: 1vh; 
     box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2);
     border-radius: 10px;
-    flex: 1 1 300px; /* Flex-grow, flex-shrink, flex-basis */
-    min-height: 300px; /* Minimum height for sections */
-    max-height: 400px; /* Maximum height for sections */
-    width: 100%; /* Full width by default */
+    flex: 1 1 300px; 
+    min-height: 300px; 
+    max-height: 400px; 
+    width: 100%; 
     box-sizing: border-box;
-    overflow: auto; /* Allow scrolling if content overflows */
+    overflow: auto; 
 }
 
-/* Specific height for Team Numbers and Algae Net Scoring sections */
+
 #team-section, #scoring, #mobility {
-    height: auto; /* Allow height to adjust */
-    margin-left: 0; /* Remove left margin */
+    height: auto; 
+    margin-left: 0; 
 }
 
-/* Responsive button group */
+
 .button-group {
     display: flex;
     flex-direction: column;
-    gap: 1vh; /* Use viewport units for gap */
-    margin-top: 1vh; /* Use viewport units for margin */
+    gap: 1vh; 
+    margin-top: 1vh; 
 }
 
 .button-row {
     display: flex;
-    gap: 1vh; /* Use viewport units for gap */
-    justify-content: center; /* Center buttons horizontally */
+    gap: 1vh; 
+    justify-content: center; 
 }
 
 .button-group button {
     background-color: red;
     color: white;
-    padding: 1vh 2vw; /* Use viewport units for padding */
+    padding: 1vh 2vw; 
     border: none;
     cursor: pointer;
-    width: 100%; /* Full width for buttons */
-    max-width: 150px; /* Limit maximum button width */
-    height: auto; /* Allow height to adjust */
-    min-height: 50px; /* Minimum height for buttons */
+    width: 100%; 
+    max-width: 150px; 
+    height: auto; 
+    min-height: 50px; 
     border-radius: 5px;
     transition: background 0.3s ease-in-out;
-    font-size: clamp(14px, 2vw, 18px); /* Responsive font size */
+    font-size: clamp(14px, 2vw, 18px); 
 }
 
 .button-group button.active {
@@ -96,25 +96,25 @@
 .input-group {
     display: flex;
     flex-direction: column;
-    gap: 1vh; /* Use viewport units for gap */
+    gap: 1vh; 
 }
 
 .team-number-box {
     border: 2px solid #4CAF50;
-    padding: 1vh; /* Use viewport units for padding */
-    margin: 1vh 0; /* Use viewport units for margin */
+    padding: 1vh; 
+    margin: 1vh 0; 
     border-radius: 5px;
     background-color: #f9f9f9;
-    font-size: clamp(16px, 2.5vw, 24px); /* Responsive font size */
+    font-size: clamp(16px, 2.5vw, 24px); 
     text-align: center;
     width: 100%;
     box-sizing: border-box;
 }
 
 .pit-scout-button {
-    padding: 2vh 4vw; /* Use viewport units for padding */
+    padding: 2vh 4vw; 
     font-family: Impact, sans-serif;
-    font-size: clamp(24px, 4vw, 36px); /* Responsive font size */
+    font-size: clamp(24px, 4vw, 36px); 
     cursor: pointer;
     background-color: #4CAF50;
     color: white;
@@ -123,8 +123,8 @@
     text-decoration: none;
     transition: all 0.3s;
     display: inline-block;
-    width: 100%; /* Full width for button */
-    max-width: 300px; /* Limit maximum button width */
+    width: 100%; 
+    max-width: 300px; 
 }
 
 .pit-scout-button:hover {
@@ -132,31 +132,31 @@
     transform: scale(1.05);
 }
 
-/* Centering the button */
+
 .button-container {
     display: flex;
     justify-content: center;
-    margin-bottom: 2vh; /* Use viewport units for margin */
+    margin-bottom: 2vh; 
 }
 
 #restart-button {
-    padding: 1.5vh 3vw; /* Use viewport units for padding */
-    font-size: clamp(16px, 2.5vw, 20px); /* Responsive font size */
+    padding: 1.5vh 3vw; 
+    font-size: clamp(16px, 2.5vw, 20px); 
     background-color: #ff4444;
     color: white;
     border: none;
     border-radius: 8px;
     cursor: pointer;
     transition: background 0.3s ease-in-out;
-    width: 100%; /* Full width for button */
-    max-width: 200px; /* Limit maximum button width */
+    width: 100%; 
+    max-width: 200px; 
 }
 
 #restart-button:hover {
     background-color: #cc0000;
 }
 
-/* Responsive Design */
+
 @media (max-width: 768px) {
     .sections-container {
         flex-direction: column;
@@ -164,30 +164,30 @@
     }
 
     .section {
-        width: 90%; /* Adjust width for smaller screens */
+        width: 90%; 
         max-width: none;
     }
 
     .button-group button {
-        max-width: 100%; /* Full width for buttons on smaller screens */
+        max-width: 100%; 
     }
 
     .pit-scout-button, #restart-button {
-        max-width: 100%; /* Full width for buttons on smaller screens */
+        max-width: 100%; 
     }
 }
 
 @media (max-width: 480px) {
     body {
-        padding: 1vh; /* Reduce padding for very small screens */
+        padding: 1vh; 
     }
 
     .section {
-        padding: 1vh; /* Reduce padding for very small screens */
+        padding: 1vh; 
     }
 
     .button-group button {
-        min-height: 40px; /* Reduce button height for very small screens */
+        min-height: 40px; 
     }
 }
         
