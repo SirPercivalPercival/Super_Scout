@@ -3,7 +3,7 @@ from decouple import config
 import os
 
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = Path(__file__).resolve().parent.parent
 DIRS: [r'C:\Users\yello\Downloads\pit scout and super scout']
 
 
@@ -12,7 +12,8 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-your-secret-key-here'
 
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '7999']
+
 
 
 INSTALLED_APPS = [
@@ -89,10 +90,11 @@ USE_TZ = True
 
 
 
-STATIC_URL = "static/"
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / "assets"
 STATICFILES_DIRS = [
-    BASE_DIR / "static"
+    os.path.join(BASE_DIR, 'static'),  # Adjust this if your styles.css is directly in the root
+    BASE_DIR,  # This will include the root folder
 ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

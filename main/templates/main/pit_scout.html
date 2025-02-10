@@ -5,485 +5,589 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pit Scout</title>
-    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <link rel="manifest" href="static\manifest.json">
     <meta name="theme-color" content="#00ffff">
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link rel="stylesheet" href="static\styles.css">
     <style>
-        .fade-in {
-            opacity: 0; 
-            transition: opacity 500ms ease-in;
-        }
-
+        
         body {
             display: flex;
             flex-direction: column;
+            justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            height: 100vh;
             margin: 0;
-            font-family: Impact, sans-serif;
+            padding: 20px;
+            box-sizing: border-box;
+            font-family: 'Bebas Neue', sans-serif;
             background-color: rgb(0, 217, 255);
             color: black;
-            position: relative;
-            padding: 20px;
         }
-        .title {
-            font-size: clamp(32px, 8vw, 48px);
-            margin-top: 20px;
+        
+        
+        .sections-container {
+            display: flex;
+            justify-content: flex-start;
+            align-items: stretch;
+            width: 100%;
+            flex-wrap: nowrap;
+            padding-left: 0;
+        }
+        
+        
+        .section {
+            border: 2px solid black;
+            padding: 15px;
+            background: white;
+            margin: 10px;
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            height: 400px;
+            min-width: 0px;
+            flex: 1; 
+            max-width: 300px; 
+        }
+        
+       
+        #team-section, #scoring, #mobility {
+            height: 400px;
+            margin-left: 20px;
+        }
+        #team-section {
+            margin-left: 0;
+        }
+        
+       
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .button-row {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .button-group button {
+            background-color: red;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            width: 100px;
+            height: 50px;
+            border-radius: 5px;
+            transition: background 0.3s ease-in-out;
+        }
+        
+        .button-group button.active {
+            background-color: green;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .team-number-box {
+            border: 2px solid #4CAF50;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            font-size: 20px;
             text-align: center;
+            width: 100%;
+            box-sizing: border-box;
         }
-        .home-button {
+        
+        .pit-scout-button {
+            padding: 25px 50px;
             font-family: Impact, sans-serif;
-            font-size: clamp(20px, 6vw, 28px);
+            font-size: clamp(32px, 7vw, 46px);
             cursor: pointer;
             background-color: #4CAF50;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 12px;
             text-decoration: none;
-            white-space: nowrap;
-            padding: 10px 20px;
-            margin-bottom: 30px;
             transition: all 0.3s;
+            display: inline-block;
         }
-        .home-button:hover {
+        
+        .pit-scout-button:hover {
             background-color: #45a049;
             transform: scale(1.05);
         }
-
-        @media screen and (max-width: 600px) {
-            body {
-                padding: 10px;
+        
+        
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        #restart-button {
+            padding: 15px 30px;
+            font-size: 20px;
+            background-color: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease-in-out;
+        }
+        
+        #restart-button:hover {
+            background-color: #cc0000;
+        }
+        
+        
+        @media (max-width: 768px) {
+            .sections-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .section {
+                width: 90%;
+                max-width: 300px;
             }
         }
+        
+        
 
-        .fade-in {
-            opacity: 0;
-            transition: opacity 500ms ease-in; 
-        }
 
-        .chassis-container, .gear-ratio-container, .vision-container, .hang-container, .reef-capability-container, .confidence-container, .experience-container, .intake-container, .mechanism-container {
-            border: 2px solid black;
-            padding: 5px;
-            width: 400px;
-            margin: 20px auto;
-            display: flex;
-            align-items: center;
-        }
-
-        .chassis-container h3, .gear-ratio-container h3, .vision-container h3, .hang-container h3, .reef-capability-container h3, .confidence-container h3, .experience-container h3 {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 32px;
-            margin-right: 10px;
-        }
-
-        .radio-button label, .gear-ratio-label {
-            font-family: 'Bebas Neue', sans-serif;
-        }
-
-        .radio-button {
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            margin: 6px 0;
-            font-size: 18px;
-        }
-
-        .radio-button input[type="radio"] {
-            width: 18px;
-            height: 18px;
-            margin-right: 6px;
-        }
-
-        .gear-ratio-input, .experience-input {
-            margin: 0 10px;
-            width: 60px;
-        }
-
-        .vision-container, .hang-container {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .vision-container {
-            margin-bottom: 40px;
-        }
-
-        .reef-capability-container {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .reef-capability-options {
-            display: flex;
-            flex-wrap: wrap;
-            width: 100%;
-        }
-
-        .reef-capability-option {
-            width: 50%;
-            display: flex;
-            align-items: center;
-        }
-
-        .vision-container {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-        }
-
-        .vision-options {
-            display: flex;
-            margin-left: 10px;
-        }
-
-        .hang-container {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-        }
-
-        .hang-options {
-            display: flex;
-            margin-left: 10px;
-        }
-
-        .info-container {
-            border: 2px solid black; 
-            padding: 20px; 
-            width: 600px;
-            margin: 20px auto; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: flex-start;
-            box-sizing: border-box; 
-        }
-
-        .info-container h3 {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 32px;
-            margin-bottom: 10px;
-        }
-
-        .info-input {
-            margin: 5px 0; 
-            width: 100%; 
-            padding: 10px; 
-            font-size: 16px;
-            box-sizing: border-box; 
-            background-color: #f0f0f0; /* Light background for readonly fields */
-            border: 1px solid #ccc; /* Border for readonly fields */
-            color: #333; /* Text color */
-        }
     </style>
 </head>
-<body class="fade-in">
-    <a id="home-button" href="{% url 'main:index' %}" class="home-button">Back to Home</a>
-    
-    <!-- Restore the title text -->
-    <h1 class="title">PIT SCOUT</h1>
-
- 
-
-    <!-- INFORMATION Section -->
-    <div class="info-container">
-        <h3>INFORMATION</h3>
-        <label for="scouter-name">Scouter Name:</label>
-        <input type="text" id="scouter-name" class="info-input" value="John Doe" readonly>
-
-        <label for="team-number">Team Number:</label>
-        <input type="number" id="team-number" class="info-input" value="1234" readonly>
-
-        <label for="match-number">Match#:</label>
-        <input type="number" id="match-number" class="info-input" value="1" readonly>
-
-        <label for="event">Event:</label>
-        <input type="text" id="event" class="info-input" value="Regional" readonly>
+<body>
+    <div class="button-container">
+        <a id="redirect-button" href="index.html" class="pit-scout-button">Go to Main Page</a>
     </div>
 
-    <!-- Chassis Section -->
-    <div class="chassis-container">
-        <h3>Chassis:</h3>
-        <div class="radio-button">
-            <input type="radio" name="driveType" value="Swerve Drive" id="swerve-drive" required>
-            <label for="swerve-drive">Swerve Drive</label>
-        </div>
-        <div class="radio-button">
-            <input type="radio" name="driveType" value="Mecanum" id="mecanum-drive" required>
-            <label for="mecanum-drive">Mecanum</label>
-        </div>
-        <div class="radio-button">
-            <input type="radio" name="driveType" value="Tank Drive" id="tank-drive" required>
-            <label for="tank-drive">Tank Drive</label>
-        </div>
-    </div>
-
-    <!-- Gear Ratio Section -->
-    <div class="gear-ratio-container">
-        <h3>Gear Ratio:</h3>
-        <select id="gear-ratio-1">
-            <option value="L1">L1</option>
-            <option value="L2">L2</option>
-            <option value="L3">L3</option>
-            <option value="L4">L4</option>
-        </select>
-        <span>:</span>
-        <select id="gear-ratio-2">
-            <option value="L1">L1</option>
-            <option value="L2">L2</option>
-            <option value="L3">L3</option>
-            <option value="L4">L4</option>
-        </select>
-    </div>
-
-    <!-- Mechanism Section -->
-    <div class="mechanism-container">
-        <h3>Mechanism:</h3>
-        <div class="radio-button">
-            <input type="radio" name="mechanism" value="Arm" id="arm-mechanism">
-            <label for="arm-mechanism">Arm</label>
-        </div>
-        <div class="radio-button">
-            <input type="radio" name="mechanism" value="Elevator" id="elevator-mechanism">
-            <label for="elevator-mechanism">Elevator</label>
-            <input type="text" class="gear-ratio-input" placeholder="Others:">
-        </div>
-    </div>
-
-    <!-- Intake Section -->
-    <div class="intake-container">
-        <h3>Intake:</h3>
-        <div class="radio-button">
-            <input type="radio" name="Intake" value="Share" id="share-intake">
-            <label for="share-intake">Share</label>
-        </div>
-        <div class="radio-button">
-            <input type="radio" name="Intake" value="Independent" id="independent-intake">
-            <label for="independent-intake">Independent</label>
-        </div>
-    </div>
-
-    <!-- Reef Capability -->
-    <div class="reef-capability-container">
-        <h3>Reef Capability:</h3>
-        <div class="reef-capability-options">
-            <div class="reef-capability-option">
-                <input type="checkbox" name="reefCapability" value="L1" id="l1" required>
-                <label for="l1">L1</label>
+        <div class="sections-container">
+            <div class="section" id="team-section">
+                <h2>TEAM NUMBERS</h2>
+                <div id="team-number-1" class="team-number-box">Team 1:</div>
+                <div id="team-number-2" class="team-number-box">Team 2:</div>
+                <div id="team-number-3" class="team-number-box">Team 3:</div>
             </div>
-            <div class="reef-capability-option">
-                <input type="checkbox" name="reefCapability" value="L2" id="l2" required>
-                <label for="l2">L2</label>
-            </div>
-            <div class="reef-capability-option">
-                <input type="checkbox" name="reefCapability" value="L3" id="l3" required>
-                <label for="l3">L3</label>
-            </div>
-            <div class="reef-capability-option">
-                <input type="checkbox" name="reefCapability" value="L4" id="l4" required>
-                <label for="l4">L4</label>
+
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    
+                    const teamNumber1 = localStorage.getItem("teamNumber1") || "N/A";
+                    const teamNumber2 = localStorage.getItem("teamNumber2") || "N/A";
+                    const teamNumber3 = localStorage.getItem("teamNumber3") || "N/A";
+                
+                    
+                    console.log("Retrieved Team Numbers:", {
+                        teamNumber1: teamNumber1,
+                        teamNumber2: teamNumber2,
+                        teamNumber3: teamNumber3
+                    });
+                
+                    
+                    document.getElementById("team-number-1").textContent = `Team 1: ${teamNumber1}`;
+                    document.getElementById("team-number-2").textContent = `Team 2: ${teamNumber2}`;
+                    document.getElementById("team-number-3").textContent = `Team 3: ${teamNumber3}`;
+                });
+            </script>
+        <div class="section" id="driver-awareness">
+            <h2>DRIVER AWARENESS</h2>
+            <div class="button-group">
+                <div class="button-row">
+                    <button onclick="selectButton(this, 'driver-awareness', 1)">1</button>
+                    <button onclick="selectButton(this, 'driver-awareness', 2)">2</button>
+                    <button onclick="selectButton(this, 'driver-awareness', 3)">3</button>
+                </div>
+                <div class="button-row">
+                    <button onclick="selectButton(this, 'driver-awareness', 1)">1</button>
+                    <button onclick="selectButton(this, 'driver-awareness', 2)">2</button>
+                    <button onclick="selectButton(this, 'driver-awareness', 3)">3</button>
+                </div>
+                <div class="button-row">
+                    <button onclick="selectButton(this, 'driver-awareness', 1)">1</button>
+                    <button onclick="selectButton(this, 'driver-awareness', 2)">2</button>
+                    <button onclick="selectButton(this, 'driver-awareness', 3)">3</button>
+                </div>
             </div>
         </div>
-    </div>
-
-    <!-- Vision Section -->
-    <div class="vision-container">
-        <h3>Vision:</h3>
-        <div class="vision-options">
-            <div class="radio-button">
-                <input type="checkbox" name="visionType" value="Auto-Alignment" id="auto-alignment" required>
-                <label for="auto-alignment">Auto-Alignment</label>
-            </div>
-            <div class="radio-button">
-                <input type="checkbox" name="visionType" value="Field-Positioning" id="field-positioning" required>
-                <label for="field-positioning">Field-Positioning</label>
-            </div>
-        </div>
-    </div>
-
-    <!-- Hang Section -->
-    <div class="hang-container">
-        <h3>Hang:</h3>
-        <div class="hang-options">
-            <div class="radio-button">
-                <input type="radio" name="Hang" value="None/Park" id="none-park">
-                <label for="none-park">None/Park</label>
-            </div>
-            <div class="radio-button">
-                <input type="radio" name="Hang" value="Shallow" id="shallow-hang">
-                <label for="shallow-hang">Shallow</label>
-            </div>
-            <div class="radio-button">
-                <input type="radio" name="Hang" value="Deep" id="deep-hang">
-                <label for="deep-hang">Deep</label>
+        <div class="section" id="mobility">
+            <h2>MOBILITY</h2>
+            <div class="button-group">
+                <div class="button-row">
+                    <button onclick="selectButton(this, 'mobility', 1)">1</button>
+                    <button onclick="selectButton(this, 'mobility', 2)">2</button>
+                    <button onclick="selectButton(this, 'mobility', 3)">3</button>
+                </div>
+                <div class="button-row">
+                    <button onclick="selectButton(this, 'mobility', 1)">1</button>
+                    <button onclick="selectButton(this, 'mobility', 2)">2</button>
+                    <button onclick="selectButton(this, 'mobility', 3)">3</button>
+                </div>
+                <div class="button-row">
+                    <button onclick="selectButton(this, 'mobility', 1)">1</button>
+                    <button onclick="selectButton(this, 'mobility', 2)">2</button>
+                    <button onclick="selectButton(this, 'mobility', 3)">3</button>
+                </div>
             </div>
         </div>
-    </div>
-
-    <!-- Confidence Section -->
-    <div class="confidence-container">
-        <h3>Is Human Confident in scoring algae to net?</h3>
-        <div class="radio-button">
-            <input type="radio" name="confidence" value="Yes" id="confidence-yes" required>
-            <label for="confidence-yes">Yes</label>
+        <div class="section" id="defense">
+            <h2>DEFENSE</h2>
+            <div class="button-group">
+                <div class="button-row">
+                    <button onclick="selectButton(this, 'defense', 1)">1</button>
+                    <button onclick="selectButton(this, 'defense', 2)">2</button>
+                    <button onclick="selectButton(this, 'defense', 3)">3</button>
+                </div>
+                <div class="button-row">
+                    <button onclick="selectButton(this, 'defense', 1)">1</button>
+                    <button onclick="selectButton(this, 'defense', 2)">2</button>
+                    <button onclick="selectButton(this, 'defense', 3)">3</button>
+                </div>
+                <div class="button-row">
+                    <button onclick="selectButton(this, 'defense', 1)">1</button>
+                    <button onclick="selectButton(this, 'defense', 2)">2</button>
+                    <button onclick="selectButton(this, 'defense', 3)">3</button>
+                </div>
+            </div>
         </div>
-        <div class="radio-button">
-            <input type="radio" name="confidence" value="No" id="confidence-no" required>
-            <label for="confidence-no">No</label>
+        <div class="section" id="human-player-awareness">
+            <h2>HUMAN PLAYER AWARENESS</h2>
+            <div class="button-group">
+                <div class="button-row">
+                    <button onclick="selectButton(this, 'human-player-awareness', 1)">1</button>
+                    <button onclick="selectButton(this, 'human-player-awareness', 2)">2</button>
+                </div>
+                <div class="button-row">
+                    <button onclick="selectButton(this, 'human-player-awareness', 1)">1</button>
+                    <button onclick="selectButton(this, 'human-player-awareness', 2)">2</button>
+                </div>
+                <div class="button-row">
+                    <button onclick="selectButton(this, 'human-player-awareness', 1)">1</button>
+                    <button onclick="selectButton(this, 'human-player-awareness', 2)">2</button>
+                </div>
+            </div>
+            <button id="restart-button" style="margin-top: 10px;">Restart Selections</button>
         </div>
-    </div>
-
-    <!-- Driver Experience Section -->
-    <div class="experience-container">
-        <h3>Driver Experience (Year):</h3>
-        <input type="number" class="experience-input" placeholder="Years" min="0" required id="driver-experience">
-    </div>
-
-    <!-- Driver Awareness Section -->
-    <div class="experience-container">
-        <h3>Driver Awareness:</h3>
-        <input type="range" class="experience-input" min="1" max="10" value="5" id="driver-awareness-slider" required>
-        <span id="slider-value">5</span>
+        <div class="section" id="scoring">
+            <h2>ALGAE NET SCORING</h2>
+            <div class="input-group">
+                <label>Successfully Scored</label>
+                <input type="number" id="successfully-scored" oninput="saveScoringData()" min="0">
+                <label>Total Attempts</label>
+                <input type="number" id="total-attempts" oninput="saveScoringData()" min="0">
+                <label>Success Rate</label>
+                <input type="text" id="success-rate" readonly>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Save form data to local storage
-        function saveFormData() {
-            const scouterName = document.getElementById("scouter-name").value;
-            const teamNumber = document.getElementById("team-number").value;
-            const matchNumber = document.getElementById("match-number").value;
-            const eventField = document.getElementById("event").value;
 
-            localStorage.setItem("scouterName", scouterName);
-            localStorage.setItem("teamNumber", teamNumber);
-            localStorage.setItem("matchNumber", matchNumber);
-            localStorage.setItem("eventField", eventField);
-
-            // Save other sections
-            localStorage.setItem("driveType", document.querySelector('input[name="driveType"]:checked')?.value || '');
-            localStorage.setItem("gearRatio1", document.getElementById("gear-ratio-1").value);
-            localStorage.setItem("gearRatio2", document.getElementById("gear-ratio-2").value);
-            localStorage.setItem("mechanism", document.querySelector('input[name="mechanism"]:checked')?.value || '');
-            localStorage.setItem("intake", document.querySelector('input[name="Intake"]:checked')?.value || '');
-            localStorage.setItem("reefCapability", Array.from(document.querySelectorAll('input[name="reefCapability"]:checked')).map(el => el.value).join(','));
-            localStorage.setItem("visionType", Array.from(document.querySelectorAll('input[name="visionType"]:checked')).map(el => el.value).join(','));
-            localStorage.setItem("hang", document.querySelector('input[name="Hang"]:checked')?.value || '');
-            localStorage.setItem("confidence", document.querySelector('input[name="confidence"]:checked')?.value || '');
-            localStorage.setItem("driverExperience", document.getElementById("driver-experience").value);
-            localStorage.setItem("driverAwareness", document.getElementById("driver-awareness-slider").value);
-        }
-
-        // Load form data from local storage
-        function loadFormData() {
-            document.getElementById("scouter-name").value = localStorage.getItem("scouterName") || '';
-            document.getElementById("team-number").value = localStorage.getItem("teamNumber") || '';
-            document.getElementById("match-number").value = localStorage.getItem("matchNumber") || '';
-            document.getElementById("event").value = localStorage.getItem("eventField") || '';
-
-            // Load other sections
-            const driveType = localStorage.getItem("driveType");
-            if (driveType) {
-                document.querySelector(`input[name="driveType"][value="${driveType}"]`).checked = true;
-            }
-
-            document.getElementById("gear-ratio-1").value = localStorage.getItem("gearRatio1") || 'L1';
-            document.getElementById("gear-ratio-2").value = localStorage.getItem("gearRatio2") || 'L1';
-
-            const mechanism = localStorage.getItem("mechanism");
-            if (mechanism) {
-                document.querySelector(`input[name="mechanism"][value="${mechanism}"]`).checked = true;
-            }
-
-            const intake = localStorage.getItem("intake");
-            if (intake) {
-                document.querySelector(`input[name="Intake"][value="${intake}"]`).checked = true;
-            }
-
-            const reefCapability = localStorage.getItem("reefCapability")?.split(',') || [];
-            reefCapability.forEach(value => {
-                const checkbox = document.querySelector(`input[name="reefCapability"][value="${value}"]`);
-                if (checkbox) {
-                    checkbox.checked = true;
+        
+        document.addEventListener("DOMContentLoaded", function () {
+            
+            let selectedTeams = {}; 
+        
+            window.selectButton = function(button, category, teamIndex) {
+                
+                let buttons = button.parentElement.children;
+                for (let btn of buttons) {
+                    btn.classList.remove("active");
                 }
-            });
-
-            const visionType = localStorage.getItem("visionType")?.split(',') || [];
-            visionType.forEach(value => {
-                const checkbox = document.querySelector(`input[name="visionType"][value="${value}"]`);
-                if (checkbox) {
-                    checkbox.checked = true;
+                button.classList.add("active");
+        
+                
+                let teamNumber = localStorage.getItem(`teamNumber${teamIndex}`) || "N/A"; 
+                selectedTeams[category] = teamNumber;
+        
+                
+                updateAlgaeNetScoring();
+            }
+        
+            function updateAlgaeNetScoring() {
+                let scoringSection = document.getElementById("scoring");
+                let algaeNetScoreText = document.getElementById("algae-net-score");
+            
+                
+                const teamNumber1 = localStorage.getItem("teamNumber1") || "N/A";
+                const teamNumber2 = localStorage.getItem("teamNumber2") || "N/A";
+                const teamNumber3 = localStorage.getItem("teamNumber3") || "N/A";
+            
+                
+                let humanPlayerAwarenessButtons = document.querySelectorAll("#human-player-awareness .button-group button.active");
+            
+                if (humanPlayerAwarenessButtons.length === 2) {
+                    let selectedRows = [];
+                    humanPlayerAwarenessButtons.forEach(button => {
+                        
+                        let row = Math.floor(Array.from(button.parentElement.parentElement.children).indexOf(button.parentElement));
+                        selectedRows.push(row + 1); 
+                    });
+            
+                    let chosenTeam = "N/A";
+            
+                    
+                    if (selectedRows.includes(1) && selectedRows.includes(2)) {
+                        chosenTeam = teamNumber3; 
+                    } else if (selectedRows.includes(2) && selectedRows.includes(3)) {
+                        chosenTeam = teamNumber1; 
+                    } else if (selectedRows.includes(1) && selectedRows.includes(3)) {
+                        chosenTeam = teamNumber2; 
+                    }
+            
+                    if (!algaeNetScoreText) {
+                        algaeNetScoreText = document.createElement("p");
+                        algaeNetScoreText.id = "algae-net-score";
+                        scoringSection.appendChild(algaeNetScoreText);
+                    }
+            
+                    algaeNetScoreText.textContent = `Team Number Chosen: ${chosenTeam}`;
+                } else {
+                    if (!algaeNetScoreText) {
+                        algaeNetScoreText = document.createElement("p");
+                        algaeNetScoreText.id = "algae-net-score";
+                        scoringSection.appendChild(algaeNetScoreText);
+                    }
+                    algaeNetScoreText.textContent = "Team Number Chosen: N/A";
                 }
+            }
+        
+            document.getElementById("restart-button").addEventListener("click", function () {
+                selectedTeams = {}; 
+                document.querySelectorAll(".button-group button").forEach(button => button.classList.remove("active"));
             });
-
-            const hang = localStorage.getItem("hang");
-            if (hang) {
-                document.querySelector(`input[name="Hang"][value="${hang}"]`).checked = true;
-            }
-
-            const confidence = localStorage.getItem("confidence");
-            if (confidence) {
-                document.querySelector(`input[name="confidence"][value="${confidence}"]`).checked = true;
-            }
-
-            document.getElementById("driver-experience").value = localStorage.getItem("driverExperience") || '';
-            document.getElementById("driver-awareness-slider").value = localStorage.getItem("driverAwareness") || 5;
-            document.getElementById("slider-value").textContent = document.getElementById("driver-awareness-slider").value;
-        }
-
-        // Load data when the page is loaded
-        window.onload = function() {
-            loadFormData();
-            d3.select("body").style("opacity", 1);
-        };
-
-        // Save data before leaving the page
-        window.addEventListener("beforeunload", saveFormData);
-
-        // Home button functionality
-        d3.select("#home-button").on("click", function(event) {
-            event.preventDefault(); 
-            const targetUrl = this.href; 
-
-            d3.select("body")
-                .transition()
-                .duration(500) 
-                .style("opacity", 0) 
-                .on("end", function() {
-                    window.location.href = targetUrl; 
+        
+            
+            document.querySelectorAll(".button-group button").forEach(button => {
+                button.addEventListener("click", function () {
+                    let category = button.closest(".section").id;
+                    let teamIndex = [...button.parentElement.children].indexOf(button) + 1;
+                    selectButton(button, category, teamIndex);
                 });
-        });
-
-        // Pit Scout button functionality
-        d3.select("#pit-scout-button").on("click", function(event) {
-            event.preventDefault(); 
-            const targetUrl = this.href; 
-
-            // Check if all required fields are filled
-            const scouterName = document.getElementById("scouter-name").value;
-            const teamNumber = document.getElementById("team-number").value;
-            const matchNumber = document.getElementById("match-number").value;
-            const eventField = document.getElementById("event").value;
-
-            if (!scouterName || !teamNumber || !matchNumber || !eventField) {
-                alert("Please fill in all required fields in the INFORMATION section.");
-                return; // Stop the navigation if fields are not filled
-            }
-
-            d3.select("body")
-                .transition()
-                .duration(500) 
-                .style("opacity", 0) 
-                .on("end", function() {
-                    window.location.href = targetUrl;
+            });
+        
+            
+            let usedRanks = {};
+        
+            function initialize() {
+                const sections = ['driver-awareness', 'mobility', 'defense', 'human-player-awareness'];
+                sections.forEach(section => {
+                    usedRanks[section] = {};
                 });
-        });
+                restoreSelections();
+                restoreScoringData(); 
+            }
+        
+            function selectButton(button, sectionId, number) {
+                const buttons = document.querySelectorAll(`#${sectionId} .button-group button`);
+        
+                if (sectionId === 'human-player-awareness') {
+                    
+                    if (!usedRanks[sectionId]) {
+                        usedRanks[sectionId] = {};
+                    }
 
-        // Update the displayed value of the slider
-        const slider = document.getElementById("driver-awareness-slider");
-        const sliderValue = document.getElementById("slider-value");
-        slider.oninput = function() {
-            sliderValue.textContent = this.value;
-        };
+                
+                    
+        
+                    
+                    if (usedRanks[sectionId][number]) {
+                        
+                        button.classList.remove("active");
+                        button.style.backgroundColor = "red";
+                        delete usedRanks[sectionId][number];
+                    } else {
+                        
+                        const selectedKeys = Object.keys(usedRanks[sectionId] || {});
+        
+                        
+                        if (selectedKeys.length >= 2) return;
+        
+                        
+                        buttons.forEach(btn => {
+                            if (btn.textContent === button.textContent && btn.classList.contains("active")) {
+                                btn.classList.remove("active");
+                                btn.style.backgroundColor = "red";
+                                delete usedRanks[sectionId][btn.textContent];
+                            }
+                        });
+        
+                        
+                        button.classList.add("active");
+                        button.style.backgroundColor = "green";
+                        usedRanks[sectionId][number] = true;
+                    }
+                    if (sectionId === 'human-player-awareness') {
+                        handleHumanPlayerAwareness();
+                    }
+        
+                    saveSelections();
+                    return; 
+                }
+        
+               
+                const level = Math.floor(Array.from(buttons).indexOf(button) / 3) + 1;
+                const levelButtons = Array.from(buttons).slice((level - 1) * 3, level * 3);
+        
+                levelButtons.forEach(btn => {
+                    btn.classList.remove("active");
+                    btn.style.backgroundColor = "red";
+                    delete usedRanks[sectionId]?.[btn.textContent];
+                });
+        
+                const columnIndex = (number - 1);
+                for (let i = 0; i < 3; i++) {
+                    const verticalButton = buttons[i * 3 + columnIndex];
+                    if (verticalButton && verticalButton !== button) {
+                        verticalButton.classList.remove("active");
+                        verticalButton.style.backgroundColor = "red";
+                        delete usedRanks[sectionId]?.[verticalButton.textContent]; 
+                    }
+                }
+        
+                button.classList.add("active");
+                button.style.backgroundColor = "green";
+        
+                
+                if (!usedRanks[sectionId]) {
+                    usedRanks[sectionId] = {};
+                }
+                usedRanks[sectionId][number] = true;
+        
+                saveSelections();
+            }
+        
+            function handleHumanPlayerAwareness() {
+                const sectionId = 'human-player-awareness';
+                const buttons = document.querySelectorAll(`#${sectionId} .button-group button`);
+                const activeButtons = Array.from(buttons).filter(btn => btn.classList.contains("active"));
+        
+                if (activeButtons.length === 2) {
+                   
+                    const selectedRows = activeButtons.map(btn => {
+                        return Math.floor(Array.from(buttons).indexOf(btn) / 2) + 1;
+                    });
+        
+                    const allRows = [1, 2, 3];
+                    const unselectedRow = allRows.find(row => !selectedRows.includes(row));
+        
+                   
+                    if (unselectedRow !== undefined) {
+                        const unselectedButtons = Array.from(buttons).slice((unselectedRow - 1) * 2, unselectedRow * 2);
+                        unselectedButtons.forEach(btn => {
+                            btn.style.backgroundColor = "grey";
+                            btn.disabled = true;
+                        });
+                    }
+                } else {
+                    
+                    buttons.forEach(btn => {
+                        btn.style.backgroundColor = "red";
+                        btn.disabled = false;
+                    });
+        
+                    
+                    activeButtons.forEach(btn => {
+                        btn.style.backgroundColor = "green";
+                    });
+                }
+            }
+        
+            function restartHumanPlayerAwareness() {
+                const sectionId = 'human-player-awareness';
+                usedRanks[sectionId] = {}; 
+                document.querySelectorAll(`#${sectionId} .button-group button`).forEach(btn => {
+                    btn.classList.remove("active");
+                    btn.style.backgroundColor = "red"; 
+                    btn.disabled = false;
+                });
+                saveSelections(); 
+            }
+        
+            
+            const restartButton = document.getElementById("restart-button");
+            if (restartButton) {
+                restartButton.onclick = restartHumanPlayerAwareness;
+            }
+        
+            function saveSelections() {
+                localStorage.setItem("usedRanks", JSON.stringify(usedRanks));
+            }
+        
+            function restoreSelections() {
+                const savedRanks = JSON.parse(localStorage.getItem("usedRanks")) || {};
+                usedRanks = savedRanks;
+        
+                for (let sectionId in usedRanks) {
+                    for (let number in usedRanks[sectionId]) {
+                        let isActive = usedRanks[sectionId][number];
+                        if (isActive) {
+                            const buttons = document.querySelectorAll(`#${sectionId} .button-group button`);
+                            buttons.forEach(button => {
+                                if (parseInt(button.textContent) === parseInt(number)) {
+                                    button.classList.add("active");
+                                    button.style.backgroundColor = "green";
+                                }
+                            });
+                        }
+                    }
+                }
+        
+               
+                if (usedRanks['human-player-awareness']) {
+                    handleHumanPlayerAwareness();
+                }
+            }
+        
+            function saveScoringData() {
+                let successful = document.getElementById("successfully-scored").value;
+                let total = document.getElementById("total-attempts").value;
+        
+                let successRate = (parseInt(successful) > 0 && parseInt(total) > 0)
+                    ? ((successful / total) * 100).toFixed(2) + "%"
+                    : "0%";
+        
+                document.getElementById("success-rate").value = successRate;
+        
+                const scoringData = {
+                    successful,
+                    total,
+                    successRate
+                };
+                localStorage.setItem("scoringData", JSON.stringify(scoringData));
+            }
+        
+            function restoreScoringData() {
+                const data = JSON.parse(localStorage.getItem("scoringData")) || { successful: "", total: "", successRate: "" };
+        
+                const successfullyScored = document.getElementById("successfully-scored");
+                const totalAttempts = document.getElementById("total-attempts");
+                const successRate = document.getElementById("success-rate");
+        
+                if (successfullyScored) successfullyScored.value = data.successful;
+                if (totalAttempts) totalAttempts.value = data.total;
+                if (successRate) successRate.value = data.successRate || "0%";
+            }
+        
+        
+            const successfullyScored = document.getElementById("successfully-scored");
+            const totalAttempts = document.getElementById("total-attempts");
+        
+            if (successfullyScored) {
+                successfullyScored.addEventListener("input", saveScoringData);
+            }
+            if (totalAttempts) {
+                totalAttempts.addEventListener("input", saveScoringData);
+            }
+        
+            initialize();
+        });
     </script>
 </body>
-</html> 
+</html>

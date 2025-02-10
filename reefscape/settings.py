@@ -7,7 +7,8 @@ SECRET_KEY = config('SECRET_KEY', default='your-secret-key-here')
 
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '7999']
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -58,8 +59,11 @@ DATABASES = {
     }
 }
 
-STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "assets"
+STATICFILES_DIRS = [
+    BASE_DIR / "static"
+]
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

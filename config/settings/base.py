@@ -4,6 +4,8 @@ from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '7999']
+
 
 SECRET_KEY = config('SECRET_KEY')
 
@@ -76,9 +78,12 @@ USE_I18N = True
 USE_TZ = True
 
 
-STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "assets"
+STATICFILES_DIRS = [
+    BASE_DIR / "static"
+]
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

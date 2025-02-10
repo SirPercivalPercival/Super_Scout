@@ -24,3 +24,6 @@ def serve_thumbnail(request):
     except Exception as e:
         print(f"Error serving thumbnail: {e}")
         return HttpResponseNotFound('Unable to access thumbnail')
+
+def qrcode_view(request):
+    return render(request, 'main/qrcode.html')
