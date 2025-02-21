@@ -332,155 +332,22 @@
         const teamNumber3 = localStorage.getItem("teamNumber3") || "N/A";
 
         // Display team numbers in all sections
-        const sections = ["driver-awareness", "mobility", "defense", "human-player-awareness"];
-        sections.forEach(section => {
-            document.querySelectorAll(`#${section} .button-row span`).forEach((span, index) => {
-                const teamNumber = index === 0 ? teamNumber1 : index === 1 ? teamNumber2 : teamNumber3;
-                span.textContent = `Team ${index + 1}: ${teamNumber}`;
-            });
-        });
-
-        // Initialize scoring data
-        restoreScoringData();
+        document.querySelectorAll("#team-number-1-display").forEach(span => span.textContent = teamNumber1);
+        document.querySelectorAll("#team-number-2-display").forEach(span => span.textContent = teamNumber2);
+        document.querySelectorAll("#team-number-3-display").forEach(span => span.textContent = teamNumber3);
 
         // Button selection logic
-        window.selectButton = function (button, category, teamIndex) {
-            const buttons = document.querySelectorAll(`#${category} .button-group button`);
-
-            // Deactivate all buttons in the same row
-            const rowButtons = button.parentElement.children;
-            for (let btn of rowButtons) {
+        window.selectButton = function(button, category, teamIndex) {
+            let buttons = button.parentElement.children;
+            for (let btn of buttons) {
                 btn.classList.remove("active");
-                btn.style.backgroundColor = "red";
             }
-
-            // Activate the clicked button
             button.classList.add("active");
-            button.style.backgroundColor = "green";
 
-            // Ensure the same number cannot be selected in other rows
-            const allRows = document.querySelectorAll(`#${category} .button-row`);
-            allRows.forEach(row => {
-                const rowButton = row.querySelector(`button:nth-child(${teamIndex + 1})`);
-                if (rowButton && rowButton !== button) {
-                    rowButton.disabled = true;
-                    rowButton.style.backgroundColor = "grey";
-                }
-            });
-
-            // Save the selected team number
             let teamNumber = localStorage.getItem(`teamNumber${teamIndex}`) || "N/A";
             selectedTeams[category] = teamNumber;
 
             updateAlgaeNetScoring();
-        };
-
-        // Restart button logic
-        document.getElementById("restart-button").addEventListener("click", function () {
-            selectedTeams = {};
-            document.querySelectorAll(".button-group button").forEach(button => {
-                button.classList.remove("active");
-                button.style.backgroundColor = "red";
-                button.disabled = false;
-            });
-        });
-
-        // Initialize usedRanks and restore selections
-        let usedRanks = {};
-
-        function initialize() {
-            const sections = ['driver-awareness', 'mobility', 'defense', 'human-player-awareness'];
-            sections.forEach(section => {
-                usedRanks[section] = {};
-            });
-            restoreSelections();
-            restoreScoringData();
-        }
-
-        function saveSelections() {
-            localStorage.setItem("usedRanks", JSON.stringify(usedRanks));
-        }
-
-        function restoreSelections() {
-            const savedRanks = JSON.parse(localStorage.getItem("usedRanks")) || {};
-            usedRanks = savedRanks;
-
-            for (let sectionId in usedRanks) {
-                for (let number in usedRanks[sectionId]) {
-                    let isActive = usedRanks[sectionId][number];
-                    if (isActive) {
-                        const buttons = document.querySelectorAll(`#${sectionId} .button-group button`);
-                        buttons.forEach(button => {
-                            if (parseInt(button.textContent) === parseInt(number)) {
-                                button.classList.add("active");
-                                button.style.backgroundColor = "green";
-                            }
-                        });
-                    }
-                }
-            }
-
-            if (usedRanks['human-player-awareness']) {
-                handleHumanPlayerAwareness();
-            }
-        }
-
-        // Scoring logic
-        function restoreScoringData() {
-            const data = JSON.parse(localStorage.getItem("scoringData")) || { successful: "0", total: "0", successRate: "0%" };
-
-            const successfullyScored = document.getElementById("successfully-scored");
-            const totalAttempts = document.getElementById("total-attempts");
-            const successRate = document.getElementById("success-rate");
-
-            if (successfullyScored) successfullyScored.value = data.successful;
-            if (totalAttempts) totalAttempts.value = data.total;
-            if (successRate) successRate.value = data.successRate || "0%";
-        }
-
-        function incrementValue(inputId) {
-            const input = document.getElementById(inputId);
-            if (input) {
-                input.value = parseInt(input.value || 0) + 1;
-                updateSuccessRate();
-                saveScoringData();
-            }
-        }
-
-        function decrementValue(inputId) {
-            const input = document.getElementById(inputId);
-            if (input && input.value > 0) {
-                input.value = parseInt(input.value) - 1;
-                updateSuccessRate();
-                saveScoringData();
-            }
-        }
-
-        function updateSuccessRate() {
-            const successfullyScored = document.getElementById("successfully-scored");
-            const totalAttempts = document.getElementById("total-attempts");
-            const successRate = document.getElementById("success-rate");
-
-            if (successfullyScored && totalAttempts && successRate) {
-                const successful = parseInt(successfullyScored.value || 0);
-                const total = parseInt(totalAttempts.value || 0);
-                const rate = total > 0 ? ((successful / total) * 100).toFixed(2) + "%" : "0%";
-                successRate.value = rate;
-            }
-        }
-
-        function saveScoringData() {
-            const successfullyScored = document.getElementById("successfully-scored");
-            const totalAttempts = document.getElementById("total-attempts");
-            const successRate = document.getElementById("success-rate");
-
-            const data = {
-                successful: successfullyScored ? successfullyScored.value : "",
-                total: totalAttempts ? totalAttempts.value : "",
-                successRate: successRate ? successRate.value : ""
-            };
-
-            localStorage.setItem("scoringData", JSON.stringify(data));
         }
 
         function updateAlgaeNetScoring() {
@@ -527,6 +394,100 @@
             }
         }
 
+        // Restart button logic
+        document.getElementById("restart-button").addEventListener("click", function () {
+            selectedTeams = {};
+            document.querySelectorAll(".button-group button").forEach(button => {
+                button.classList.remove("active");
+                button.style.backgroundColor = "red";
+                button.disabled = false;
+            });
+        });
+
+        document.querySelectorAll(".button-group button").forEach(button => {
+            button.addEventListener("click", function () {
+                let category = button.closest(".section").id;
+                let teamIndex = [...button.parentElement.children].indexOf(button) + 1;
+                selectButton(button, category, teamIndex);
+            });
+        });
+
+        let usedRanks = {};
+
+        function initialize() {
+            const sections = ['driver-awareness', 'mobility', 'defense', 'human-player-awareness'];
+            sections.forEach(section => {
+                usedRanks[section] = {};
+            });
+            restoreSelections();
+            restoreScoringData();
+        }
+
+        function selectButton(button, sectionId, number) {
+            const buttons = document.querySelectorAll(`#${sectionId} .button-group button`);
+
+            if (sectionId === 'human-player-awareness') {
+                if (!usedRanks[sectionId]) {
+                    usedRanks[sectionId] = {};
+                }
+
+                if (usedRanks[sectionId][number]) {
+                    button.classList.remove("active");
+                    button.style.backgroundColor = "red";
+                    delete usedRanks[sectionId][number];
+                } else {
+                    const selectedKeys = Object.keys(usedRanks[sectionId] || {});
+
+                    if (selectedKeys.length >= 2) return;
+
+                    buttons.forEach(btn => {
+                        if (btn.textContent === button.textContent && btn.classList.contains("active")) {
+                            btn.classList.remove("active");
+                            btn.style.backgroundColor = "red";
+                            delete usedRanks[sectionId][btn.textContent];
+                        }
+                    });
+
+                    button.classList.add("active");
+                    button.style.backgroundColor = "green";
+                    usedRanks[sectionId][number] = true;
+                }
+
+                handleHumanPlayerAwareness();
+                saveSelections();
+                return;
+            }
+
+            const level = Math.floor(Array.from(buttons).indexOf(button) / 3) + 1;
+            const levelButtons = Array.from(buttons).slice((level - 1) * 3, level * 3);
+
+            levelButtons.forEach(btn => {
+                btn.classList.remove("active");
+                btn.style.backgroundColor = "red";
+                delete usedRanks[sectionId]?.[btn.textContent];
+            });
+
+            const columnIndex = (number - 1);
+            for (let i = 0; i < 3; i++) {
+                const verticalButton = buttons[i * 3 + columnIndex];
+                if (verticalButton && verticalButton !== button) {
+                    verticalButton.classList.remove("active");
+                    verticalButton.style.backgroundColor = "red";
+                    delete usedRanks[sectionId]?.[verticalButton.textContent];
+                }
+            }
+
+            button.classList.add("active");
+            button.style.backgroundColor = "green";
+
+            if (!usedRanks[sectionId]) {
+                usedRanks[sectionId] = {};
+            }
+            usedRanks[sectionId][number] = true;
+
+            saveSelections();
+        }
+
         function handleHumanPlayerAwareness() {
             const sectionId = 'human-player-awareness';
             const buttons = document.querySelectorAll(`#${sectionId} .button-group button`);
@@ -568,6 +529,97 @@
                 btn.disabled = false;
             });
             saveSelections();
+        }
+
+        const restartButton = document.getElementById("restart-button");
+        if (restartButton) {
+            restartButton.onclick = restartHumanPlayerAwareness;
+        }
+
+        function saveSelections() {
+            localStorage.setItem("usedRanks", JSON.stringify(usedRanks));
+        }
+
+        function restoreSelections() {
+            const savedRanks = JSON.parse(localStorage.getItem("usedRanks")) || {};
+            usedRanks = savedRanks;
+
+            for (let sectionId in usedRanks) {
+                for (let number in usedRanks[sectionId]) {
+                    let isActive = usedRanks[sectionId][number];
+                    if (isActive) {
+                        const buttons = document.querySelectorAll(`#${sectionId} .button-group button`);
+                        buttons.forEach(button => {
+                            if (parseInt(button.textContent) === parseInt(number)) {
+                                button.classList.add("active");
+                                button.style.backgroundColor = "green";
+                            }
+                        });
+                    }
+                }
+            }
+
+            if (usedRanks['human-player-awareness']) {
+                handleHumanPlayerAwareness();
+            }
+        }
+
+        function restoreScoringData() {
+            const data = JSON.parse(localStorage.getItem("scoringData")) || { successful: "0", total: "0", successRate: "0%" };
+
+            const successfullyScored = document.getElementById("successfully-scored");
+            const totalAttempts = document.getElementById("total-attempts");
+            const successRate = document.getElementById("success-rate");
+
+            if (successfullyScored) successfullyScored.value = data.successful;
+            if (totalAttempts) totalAttempts.value = data.total;
+            if (successRate) successRate.value = data.successRate || "0%";
+        }
+
+        // Ensure global access for increment/decrement
+        window.incrementValue = function(inputId) {
+            const input = document.getElementById(inputId);
+            if (input) {
+                input.value = parseInt(input.value || 0) + 1;
+                updateSuccessRate();
+                saveScoringData();
+            }
+        }
+
+        window.decrementValue = function(inputId) {
+            const input = document.getElementById(inputId);
+            if (input && input.value > 0) {
+                input.value = parseInt(input.value) - 1;
+                updateSuccessRate();
+                saveScoringData();
+            }
+        }
+
+        function updateSuccessRate() {
+            const successfullyScored = document.getElementById("successfully-scored");
+            const totalAttempts = document.getElementById("total-attempts");
+            const successRate = document.getElementById("success-rate");
+
+            if (successfullyScored && totalAttempts && successRate) {
+                const successful = parseInt(successfullyScored.value || 0);
+                const total = parseInt(totalAttempts.value || 0);
+                const rate = total > 0 ? ((successful / total) * 100).toFixed(2) + "%" : "0%";
+                successRate.value = rate;
+            }
+        }
+
+        function saveScoringData() {
+            const successfullyScored = document.getElementById("successfully-scored");
+            const totalAttempts = document.getElementById("total-attempts");
+            const successRate = document.getElementById("success-rate");
+
+            const data = {
+                successful: successfullyScored ? successfullyScored.value : "",
+                total: totalAttempts ? totalAttempts.value : "",
+                successRate: successRate ? successRate.value : ""
+            };
+
+            localStorage.setItem("scoringData", JSON.stringify(data));
         }
 
         initialize();
