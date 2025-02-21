@@ -348,19 +348,15 @@
         let selectedNumber = button.textContent; // Get the number of the selected button
 
         // Check if the selected number is already active in any row
-        const allButtons = document.querySelectorAll(`.${category} .button-row button`);
+        const allButtons = document.querySelectorAll(`.button-group button`);
         let alreadySelectedButton = null;
 
         allButtons.forEach(btn => {
             if (btn.textContent === selectedNumber && btn !== button && btn.classList.contains("active")) {
                 alreadySelectedButton = btn; // Store the already selected button
+                btn.classList.remove("active"); // Unselect the previously selected button
             }
         });
-
-        // If the selected number is already active, unselect it
-        if (alreadySelectedButton) {
-            alreadySelectedButton.classList.remove("active");
-        }
 
         // Remove active class from all buttons in the current row
         for (let btn of buttons) {
