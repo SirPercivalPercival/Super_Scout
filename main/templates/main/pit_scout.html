@@ -344,8 +344,8 @@
         restoreScoringData();
 
         // Button selection logic
-        window.selectButton = function (button, sectionId, number) {
-            const buttons = document.querySelectorAll(`#${sectionId} .button-group button`);
+        window.selectButton = function (button, category, teamIndex) {
+            const buttons = document.querySelectorAll(`#${category} .button-group button`);
 
             // Deactivate all buttons in the same row
             const rowButtons = button.parentElement.children;
@@ -359,16 +359,20 @@
             button.style.backgroundColor = "green";
 
             // Ensure the same number cannot be selected in other rows
-            const allRows = document.querySelectorAll(`#${sectionId} .button-row`);
+            const allRows = document.querySelectorAll(`#${category} .button-row`);
             allRows.forEach(row => {
-                const rowButton = row.querySelector(`button:nth-child(${number + 1})`);
+                const rowButton = row.querySelector(`button:nth-child(${teamIndex + 1})`);
                 if (rowButton && rowButton !== button) {
                     rowButton.disabled = true;
                     rowButton.style.backgroundColor = "grey";
                 }
             });
 
-            saveSelections();
+            // Save the selected team number
+            let teamNumber = localStorage.getItem(`teamNumber${teamIndex}`) || "N/A";
+            selectedTeams[category] = teamNumber;
+
+            updateAlgaeNetScoring();
         };
 
         // Restart button logic
@@ -390,6 +394,7 @@
                 usedRanks[section] = {};
             });
             restoreSelections();
+            restoreScoringData();
         }
 
         function saveSelections() {
@@ -413,6 +418,10 @@
                         });
                     }
                 }
+            }
+
+            if (usedRanks['human-player-awareness']) {
+                handleHumanPlayerAwareness();
             }
         }
 
@@ -472,6 +481,93 @@
             };
 
             localStorage.setItem("scoringData", JSON.stringify(data));
+        }
+
+        function updateAlgaeNetScoring() {
+            let scoringSection = document.getElementById("scoring");
+            let algaeNetScoreText = document.getElementById("algae-net-score");
+
+            const teamNumber1 = localStorage.getItem("teamNumber1") || "N/A";
+            const teamNumber2 = localStorage.getItem("teamNumber2") || "N/A";
+            const teamNumber3 = localStorage.getItem("teamNumber3") || "N/A";
+
+            let humanPlayerAwarenessButtons = document.querySelectorAll("#human-player-awareness .button-group button.active");
+
+            if (humanPlayerAwarenessButtons.length === 2) {
+                let selectedRows = [];
+                humanPlayerAwarenessButtons.forEach(button => {
+                    let row = Math.floor(Array.from(button.parentElement.parentElement.children).indexOf(button.parentElement));
+                    selectedRows.push(row + 1);
+                });
+
+                let chosenTeam = "N/A";
+
+                if (selectedRows.includes(1) && selectedRows.includes(2)) {
+                    chosenTeam = teamNumber3;
+                } else if (selectedRows.includes(2) && selectedRows.includes(3)) {
+                    chosenTeam = teamNumber1;
+                } else if (selectedRows.includes(1) && selectedRows.includes(3)) {
+                    chosenTeam = teamNumber2;
+                }
+
+                if (!algaeNetScoreText) {
+                    algaeNetScoreText = document.createElement("p");
+                    algaeNetScoreText.id = "algae-net-score";
+                    scoringSection.appendChild(algaeNetScoreText);
+                }
+
+                algaeNetScoreText.textContent = `Team Number Chosen: ${chosenTeam}`;
+            } else {
+                if (!algaeNetScoreText) {
+                    algaeNetScoreText = document.createElement("p");
+                    algaeNetScoreText.id = "algae-net-score";
+                    scoringSection.appendChild(algaeNetScoreText);
+                }
+                algaeNetScoreText.textContent = "Team Number Chosen: N/A";
+            }
+        }
+
+        function handleHumanPlayerAwareness() {
+            const sectionId = 'human-player-awareness';
+            const buttons = document.querySelectorAll(`#${sectionId} .button-group button`);
+            const activeButtons = Array.from(buttons).filter(btn => btn.classList.contains("active"));
+
+            if (activeButtons.length === 2) {
+                const selectedRows = activeButtons.map(btn => {
+                    return Math.floor(Array.from(buttons).indexOf(btn) / 2) + 1;
+                });
+
+                const allRows = [1, 2, 3];
+                const unselectedRow = allRows.find(row => !selectedRows.includes(row));
+
+                if (unselectedRow !== undefined) {
+                    const unselectedButtons = Array.from(buttons).slice((unselectedRow - 1) * 2, unselectedRow * 2);
+                    unselectedButtons.forEach(btn => {
+                        btn.style.backgroundColor = "grey";
+                        btn.disabled = true;
+                    });
+                }
+            } else {
+                buttons.forEach(btn => {
+                    btn.style.backgroundColor = "red";
+                    btn.disabled = false;
+                });
+
+                activeButtons.forEach(btn => {
+                    btn.style.backgroundColor = "green";
+                });
+            }
+        }
+
+        function restartHumanPlayerAwareness() {
+            const sectionId = 'human-player-awareness';
+            usedRanks[sectionId] = {};
+            document.querySelectorAll(`#${sectionId} .button-group button`).forEach(btn => {
+                btn.classList.remove("active");
+                btn.style.backgroundColor = "red";
+                btn.disabled = false;
+            });
+            saveSelections();
         }
 
         initialize();
