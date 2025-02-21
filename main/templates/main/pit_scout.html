@@ -204,26 +204,6 @@
     <div class="button-container">
         <a id="redirect-button" href="https://sirpercivalpercival.github.io/Super_Scout/" class="pit-scout-button">Go to Main Page</a>
     </div>
-    <script>
-                document.addEventListener("DOMContentLoaded", function () {
-                    
-                    const teamNumber1 = localStorage.getItem("teamNumber1") || "N/A";
-                    const teamNumber2 = localStorage.getItem("teamNumber2") || "N/A";
-                    const teamNumber3 = localStorage.getItem("teamNumber3") || "N/A";
-                
-                    
-                    console.log("Retrieved Team Numbers:", {
-                        teamNumber1: teamNumber1,
-                        teamNumber2: teamNumber2,
-                        teamNumber3: teamNumber3
-                    });
-                
-                    
-                    document.getElementById("team-number-1-display").textContent = `Team 1: ${teamNumber1}`;
-                    document.getElementById("team-number-2-display").textContent = `Team 2: ${teamNumber2}`;
-                    document.getElementById("team-number-3-display").textContent = `Team 3: ${teamNumber3}`;
-                });
-            </script>
 
         <div class="sections-container">
             <div class="section" id="driver-awareness">
@@ -339,24 +319,6 @@
 
     <script>
 
-        function incrementValue(inputId) {
-        const input = document.getElementById(inputId);
-        if (input) {
-            input.value = parseInt(input.value || 0) + 1;
-            updateSuccessRate();
-            saveScoringData();
-        }
-    }
-
-    function decrementValue(inputId) {
-        const input = document.getElementById(inputId);
-        if (input && input.value > 0) {
-            input.value = parseInt(input.value) - 1;
-            updateSuccessRate();
-            saveScoringData();
-        }
-    }
-
         
         document.addEventListener("DOMContentLoaded", function () {
     let selectedTeams = {}; 
@@ -443,10 +405,7 @@
     }
 
     function selectButton(button, sectionId, number) {
-    let rowButtons = button.parentElement.querySelectorAll("button");
-    rowButtons.forEach(btn => btn.classList.remove("active"));
-    button.classList.add("active");
-}
+        const buttons = document.querySelectorAll(`#${sectionId} .button-group button`);
 
         if (sectionId === 'human-player-awareness') {
             if (!usedRanks[sectionId]) {
@@ -598,7 +557,23 @@
         if (successRate) successRate.value = data.successRate || "0%";
     }
 
-    
+    function incrementValue(inputId) {
+        const input = document.getElementById(inputId);
+        if (input) {
+            input.value = parseInt(input.value || 0) + 1;
+            updateSuccessRate();
+            saveScoringData();
+        }
+    }
+
+    function decrementValue(inputId) {
+        const input = document.getElementById(inputId);
+        if (input && input.value > 0) {
+            input.value = parseInt(input.value) - 1;
+            updateSuccessRate();
+            saveScoringData();
+        }
+    }
 
     function updateSuccessRate() {
         const successfullyScored = document.getElementById("successfully-scored");
@@ -632,3 +607,7 @@
     </script>
 </body>
 </html>
+
+
+
+
