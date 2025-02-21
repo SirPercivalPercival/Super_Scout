@@ -1,0 +1,58 @@
+{% load static %}
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>QR CODE</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+</head>
+<body>
+    <h1>QR CODE</h1>
+    <form id="pitScoutForm">
+        <!-- redacted form fields -->
+    </form>
+
+    <div id="qr-code-container">
+        <canvas id="qr-code"></canvas>
+    </div>
+
+    <script>
+        // Get the form element
+        const form = document.getElementById('pitScoutForm');
+
+        // Add an event listener to handle form submission
+        form.addEventListener('submit', event => {
+            event.preventDefault();
+
+            // Get the values from the input fields
+            const scouterName = document.getElementById('scouter-name').value;
+            const teamNumber = document.getElementById('team-number').value;
+            const matchNumber = document.getElementById('match-number').value;
+            const eventField = document.getElementById('event').value;
+            const offense = document.getElementById('offense').value;
+            const defense = document.getElementById('defense').value;
+            const cooperativeDegree = document.getElementById('cooperative-degree').value;
+
+            // Update the pitScoutData object with the new values
+            const pitScoutData = {
+                scouterName: scouterName,
+                teamNumber: teamNumber,
+                matchNumber: matchNumber,
+                eventField: eventField,
+                offense: offense,
+                defense: defense,
+                cooperativeDegree: cooperativeDegree,
+                // Add more properties for other sliders
+            };
+
+            // Generate the QR code with the updated data
+            const data = JSON.stringify(pitScoutData);
+            const qr = new QRious({
+                element: document.getElementById('qr-code'),
+                value: data,
+                size: 256
+            });
+        });
+    </script>
+</body>
+</html>

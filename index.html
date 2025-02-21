@@ -1,0 +1,232 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REEFSCAPE</title>
+    <link rel="manifest" href="static\manifest.json">
+    <meta name="theme-color" content="#00ffff">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.0/qrcode.min.js"></script>
+    <style>
+
+
+
+        .fade-in {
+            display: block;
+            opacity: 1;
+            visibility: visible;
+        }
+
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: Impact, sans-serif;
+            background-color: rgb(0, 217, 255);
+            color: black;
+            position: relative;
+            padding: 20px;  
+        }
+        .title {
+            font-size: clamp(48px, 12vw, 72px);
+            margin-top: 50px;
+            margin-bottom: 50px;
+            text-align: center;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        .manual {
+            font-size: clamp(24px, 6vw, 36px); 
+            margin-bottom: 40px;
+            text-decoration: none;
+            color: white;
+            cursor: pointer;
+            background-color: rgb(0, 9, 141);
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-align: center;  
+            white-space: nowrap;  
+        }
+        .manual:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+            
+        }
+        .pit-scout-button {
+            padding: 25px 50px;
+            font-family: Impact, sans-serif;
+            font-size: clamp(32px, 7vw, 46px);
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+        .pit-scout-button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+        .below-manual {
+            font-size: clamp(16px, 4vw, 24px);
+            margin-top: 20px;
+            text-align: center;
+            font-family: Impact, sans-serif;
+            color: black;
+        }
+        .thumbnail {
+            max-width: 300px; 
+            width: 90%;
+            height: auto;
+            margin: 20px 0;
+            border-radius: 10px; 
+        }
+        
+        @media screen and (max-width: 600px) {
+            body {
+                padding: 10px;  
+            }
+            .pit-scout-button {
+                padding: 20px 40px;
+            }
+        }
+        
+
+        .info-container {
+            border: 2px solid black; 
+            padding: 20px; 
+            width: 600px;
+            margin: 20px auto; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: flex-start;
+            box-sizing: border-box; 
+        }
+
+        .info-container h3 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        label {
+            margin-top: 10px; 
+            margin-bottom: 5px; 
+            font-size: 16px; 
+        }
+
+        .info-input {
+            margin: 5px 0; 
+            width: 100%; 
+            padding: 10px; 
+            font-size: 16px;
+            box-sizing: border-box; 
+        }
+
+        .title-image {
+            width: 100%; 
+            max-width: 600px;
+            height: auto; 
+            margin-top: 20px;
+            margin-bottom: 30px; 
+        }
+    </style>
+</head>
+<body class="fade-in" style="display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; margin: 0; font-family: Impact, sans-serif; background-color: rgb(0, 217, 255); color: black; position: relative; padding: 20px;">
+
+    <img src="static/icons/ezgif-3-e133a04608-removebg-preview.png" alt="Reefscape Title" class="title-image">
+
+    <a id="game-manual" href="static/pdfs/2025GameManual.pdf" class="manual" target="_blank">GAME MANUAL</a>
+
+    <a id="pit-scout-button" href="main\templates\main\pit_scout.html" class="pit-scout-button">Go to Super Scout</a>
+    <div style="flex-grow: 1;"></div>
+    <div class="container"></div>
+
+    <div class="info-container">
+        <h3>INFORMATION</h3>
+        <label for="scouter-name">Scouter Name:</label>
+        <input type="text" id="scouter-name" class="info-input" placeholder="Enter Scouter Name" required>
+    
+        <label for="team-number-1">Team Number 1:</label>
+        <input type="number" id="team-number-1" class="info-input" placeholder="Enter Team Number 1" min="0" required>
+    
+        <label for="team-number-2">Team Number 2:</label>
+        <input type="number" id="team-number-2" class="info-input" placeholder="Enter Team Number 2" min="0" required>
+    
+        <label for="team-number-3">Team Number 3:</label>
+        <input type="number" id="team-number-3" class="info-input" placeholder="Enter Team Number 3" min="0" required>
+    
+        <label for="match-number">Match#:</label>
+        <input type="number" id="match-number" class="info-input" placeholder="Enter Match Number" min="0" required>
+    
+        <label for="event">Event:</label>
+        <input type="text" id="event" class="info-input" placeholder="Enter Event" required>
+    
+        <label for="total-points">Total Points Scored:</label>
+        <input type="number" id="total-points" class="info-input" placeholder="Enter Total Points Scored" min="0" required>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Load data when the page is loaded
+            loadFormData();
+
+            // Attach event listener to the pit scout button
+            document.getElementById("pit-scout-button").addEventListener("click", function(event) {
+                event.preventDefault(); // Prevent default navigation
+
+                // Collect form data
+                saveFormData();
+
+                // Navigate to the pit scout page
+                window.location.href = this.href;
+            });
+        });
+
+        // Save form data to local storage
+        function saveFormData() {
+            const scouterName = document.getElementById("scouter-name").value;
+            const teamNumber1 = document.getElementById("team-number-1").value;
+            const teamNumber2 = document.getElementById("team-number-2").value;
+            const teamNumber3 = document.getElementById("team-number-3").value;
+            const matchNumber = document.getElementById("match-number").value;
+            const eventField = document.getElementById("event").value;
+            const TotalPoints = document.getElementById("total-points").value;
+
+            console.log("Saving form data...");
+            console.log("Scouter Name:", scouterName);
+            console.log("Team Number 1:", teamNumber1);
+            console.log("Team Number 2:", teamNumber2);
+            console.log("Team Number 3:", teamNumber3);
+
+            localStorage.setItem("scouterName", scouterName);
+            localStorage.setItem("teamNumber1", teamNumber1);
+            localStorage.setItem("teamNumber2", teamNumber2);
+            localStorage.setItem("teamNumber3", teamNumber3);
+            localStorage.setItem("matchNumber", matchNumber);
+            localStorage.setItem("eventField", eventField);
+            localStorage.setItem("TotalPoints", TotalPoints);
+        }
+
+        // Load form data from local storage
+        function loadFormData() {
+            document.getElementById("scouter-name").value = localStorage.getItem("scouterName") || '';
+            document.getElementById("team-number-1").value = localStorage.getItem("teamNumber1") || '';
+            document.getElementById("team-number-2").value = localStorage.getItem("teamNumber2") || '';
+            document.getElementById("team-number-3").value = localStorage.getItem("teamNumber3") || '';
+            document.getElementById("match-number").value = localStorage.getItem("matchNumber") || '';
+            document.getElementById("event").value = localStorage.getItem("eventField") || '';
+            document.getElementById("total-points").value = localStorage.getItem("TotalPoints") || '';
+        }
+    </script>
+</body>
+</html>
