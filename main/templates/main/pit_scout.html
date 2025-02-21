@@ -339,28 +339,10 @@
 
     <script>
 
-        function incrementValue(inputId) {
-        const input = document.getElementById(inputId);
-        if (input) {
-            input.value = parseInt(input.value || 0) + 1;
-            updateSuccessRate();
-            saveScoringData();
-        }
-    }
-
-    function decrementValue(inputId) {
-        const input = document.getElementById(inputId);
-        if (input && input.value > 0) {
-            input.value = parseInt(input.value) - 1;
-            updateSuccessRate();
-            saveScoringData();
-        }
-    }
-
-        
         document.addEventListener("DOMContentLoaded", function () {
     let selectedTeams = {}; 
 
+    // Define selectButton function globally
     window.selectButton = function(button, category, teamIndex) {
         let buttons = button.parentElement.children;
         let selectedNumber = button.textContent; // Get the number of the selected button
@@ -390,6 +372,25 @@
         selectedTeams[category] = teamNumber;
 
         updateAlgaeNetScoring();
+    }
+
+    // Ensure incrementValue and decrementValue are defined
+    window.incrementValue = function(inputId) {
+        const input = document.getElementById(inputId);
+        if (input) {
+            input.value = parseInt(input.value || 0) + 1;
+            updateSuccessRate();
+            saveScoringData();
+        }
+    }
+
+    window.decrementValue = function(inputId) {
+        const input = document.getElementById(inputId);
+        if (input && input.value > 0) {
+            input.value = parseInt(input.value) - 1;
+            updateSuccessRate();
+            saveScoringData();
+        }
     }
 
     function updateAlgaeNetScoring() {
@@ -441,6 +442,7 @@
         document.querySelectorAll(".button-group button").forEach(button => button.classList.remove("active"));
     });
 
+    // Add event listeners to buttons
     document.querySelectorAll(".button-group button").forEach(button => {
         button.addEventListener("click", function () {
             let category = button.closest(".section").id;
