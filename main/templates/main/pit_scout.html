@@ -427,32 +427,75 @@
             const buttons = document.querySelectorAll(`#${sectionId} .button-group button`);
             const activeButtons = Array.from(buttons).filter(btn => btn.classList.contains("active"));
 
-            if (activeButtons.length === 2) {
-                const selectedRows = activeButtons.map(btn => {
-                    return Math.floor(Array.from(buttons).indexOf(btn) / 2) + 1;
-                });
-
-                const allRows = [1, 2, 3];
-                const unselectedRow = allRows.find(row => !selectedRows.includes(row));
-
-                if (unselectedRow !== undefined) {
-                    const unselectedButtons = Array.from(buttons).slice((unselectedRow - 1) * 2, unselectedRow * 2);
-                    unselectedButtons.forEach(btn => {
-                        btn.style.backgroundColor = "grey";
-                        btn.disabled = true;
-                    });
-                }
-            } else {
-                buttons.forEach(btn => {
+            // Apply grey effect only to unselected buttons when 2 are selected
+            buttons.forEach(btn => {
+                if (activeButtons.length === 2 && !btn.classList.contains('active')) {
+                    btn.style.backgroundColor = "grey";
+                    btn.disabled = true;
+                } else {
                     btn.style.backgroundColor = "red";
                     btn.disabled = false;
-                });
+                }
+            });
 
-                activeButtons.forEach(btn => {
-                    btn.style.backgroundColor = "green";
-                });
+            // Update algae net scoring when changes occur
+            updateAlgaeNetScoring();
+        }
+
+        // ALGAE NET SCORING SPECIFIC FUNCTION
+        function updateAlgaeNetScoring() {
+            let scoringSection = document.getElementById("scoring");
+            let algaeNetScoreText = document.getElementById("algae-net-score") || 
+                document.createElement("p");
+            
+            if (!algaeNetScoreText.id) {
+                algaeNetScoreText.id = "algae-net-score";
+                scoringSection.appendChild(algaeNetScoreText);
+            }
+
+            // Get active buttons from human player awareness
+            const activeButtons = document.querySelectorAll("#human-player-awareness .button-group button.active");
+            
+            // Determine selected team based on button positions
+            if (activeButtons.length === 2) {
+                const selectedRows = Array.from(activeButtons).map(button => 
+                    Math.floor(Array.from(button.parentElement.parentElement.children)
+                    .indexOf(button.parentElement)) + 1
+                );
+
+                const teamMap = {
+                    '1,2': localStorage.getItem("teamNumber3") || "N/A",
+                    '2,3': localStorage.getItem("teamNumber1") || "N/A",
+                    '1,3': localStorage.getItem("teamNumber2") || "N/A"
+                };
+
+                const teamKey = selectedRows.sort().join(',');
+                algaeNetScoreText.textContent = `Team Number Chosen: ${teamMap[teamKey] || "N/A"}`;
+            } else {
+                algaeNetScoreText.textContent = "Team Number Chosen: N/A";
             }
         }
+
+        // MODIFIED RESTART BUTTON (Human Player Awareness only)
+        document.getElementById("restart-button").addEventListener("click", function() {
+            // Clear human player awareness
+            document.querySelectorAll('#human-player-awareness .button-group button').forEach(btn => {
+                btn.classList.remove("active");
+                btn.style.backgroundColor = "red";
+                btn.disabled = false;
+            });
+            
+            // Reset algae net scoring display
+            const algaeNetScoreText = document.getElementById("algae-net-score");
+            if(algaeNetScoreText) {
+                algaeNetScoreText.textContent = "Team Number Chosen: N/A";
+            }
+            
+            // Clear local storage for this section
+            const usedRanks = JSON.parse(localStorage.getItem("usedRanks")) || {};
+            usedRanks['human-player-awareness'] = {};
+            localStorage.setItem("usedRanks", JSON.stringify(usedRanks));
+        });
 
         function restartHumanPlayerAwareness() {
             const sectionId = 'human-player-awareness';
