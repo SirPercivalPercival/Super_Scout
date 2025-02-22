@@ -1,4 +1,5 @@
-    <!DOCTYPE html>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -324,88 +325,105 @@
 
 
     <script>
+    document.addEventListener("DOMContentLoaded", function () {
+    let usedRanks = {};
+    let selectedTeams = {};
+
+    // Load team numbers
+    const teamNumber1 = localStorage.getItem("teamNumber1") || "N/A";
+    const teamNumber2 = localStorage.getItem("teamNumber2") || "N/A";
+    const teamNumber3 = localStorage.getItem("teamNumber3") || "N/A";
+
+    // Display team numbers
+    document.querySelectorAll("#team-number-1-display").forEach(span => span.textContent = teamNumber1);
+    document.querySelectorAll("#team-number-2-display").forEach(span => span.textContent = teamNumber2);
+    document.querySelectorAll("#team-number-3-display").forEach(span => span.textContent = teamNumber3);
+
     window.selectButton = function(button, category, teamIndex) {
-    if (category !== 'human-player-awareness') {
-        // Original logic for other sections remains unchanged
         const section = document.getElementById(category);
-        const row = button.parentElement;
-        const colIndex = Array.from(row.children).indexOf(button) - 1;
+        
+        if (category === 'human-player-awareness') {
+            const row = button.parentElement;
+            const allRows = Array.from(section.querySelectorAll('.button-row'));
+            const allButtons = section.querySelectorAll('button');
+            
+            // Clear current row
+            row.querySelectorAll('button').forEach(btn => {
+                btn.classList.remove('active');
+                btn.style.backgroundColor = 'red';
+            });
 
-        row.querySelectorAll('button').forEach(btn => {
-            btn.classList.remove("active");
-            btn.style.backgroundColor = "red";
-        });
+            // Toggle current button
+            const wasActive = button.classList.contains('active');
+            button.classList.toggle('active');
+            button.style.backgroundColor = button.classList.contains('active') ? 'green' : 'red';
 
-        section.querySelectorAll(`.button-row button:nth-child(${colIndex + 2})`).forEach(btn => {
-            btn.classList.remove("active");
-            btn.style.backgroundColor = "red";
-        });
+            // Get selected numbers and rows
+            const activeButtons = Array.from(section.querySelectorAll('.active'));
+            const selectedNumbers = new Set(activeButtons.map(b => b.textContent));
+            const selectedRows = new Set(activeButtons.map(b => b.parentElement));
 
-        button.classList.add("active");
-        button.style.backgroundColor = "green";
-        selectedTeams[category] = localStorage.getItem(`teamNumber${teamIndex}`) || "N/A";
-        return;
-    }
+            // Update button states
+            allButtons.forEach(btn => {
+                const btnRow = btn.parentElement;
+                const btnNumber = btn.textContent;
+                
+                // Disable same numbers in other rows
+                if (btnRow !== row && selectedNumbers.has(btnNumber)) {
+                    btn.disabled = true;
+                    btn.style.backgroundColor = 'grey';
+                }
+                // Enable available numbers
+                else if (!btn.classList.contains('active')) {
+                    btn.disabled = false;
+                    btn.style.backgroundColor = 'red';
+                }
+            });
 
-    const section = document.getElementById(category);
-    const row = button.parentElement;
-    const allRows = Array.from(section.querySelectorAll('.button-row'));
-    const allButtons = section.querySelectorAll('button');
-
-    // Clear current row's selections
-    row.querySelectorAll('button').forEach(btn => {
-        btn.classList.remove('active');
-        btn.style.backgroundColor = 'red';
-    });
-
-    // Toggle current button's state
-    const isActive = button.classList.toggle('active');
-    button.style.backgroundColor = isActive ? 'green' : 'red';
-
-    const activeButtons = Array.from(section.querySelectorAll('.active'));
-    const selectedNumbers = new Set(activeButtons.map(btn => btn.textContent));
-    const selectedRows = new Set(activeButtons.map(btn => btn.parentElement));
-
-    // Update button states based on selected numbers
-    allButtons.forEach(btn => {
-        const btnRow = btn.parentElement;
-        const btnNumber = btn.textContent;
-        const isBtnActive = btn.classList.contains('active');
-
-        // Disable buttons with the same number in other rows if active
-        if (!isBtnActive && btnRow !== row && selectedNumbers.has(btnNumber)) {
-            btn.disabled = true;
-            btn.style.backgroundColor = 'grey';
-        } else if (!isBtnActive) {
-            btn.disabled = false;
-            btn.style.backgroundColor = 'red';
-        }
-    });
-
-    // Handle third row grey-out when two rows are selected
-    if (selectedRows.size === 2) {
-        const unselectedRow = allRows.find(r => !selectedRows.has(r));
-        unselectedRow.querySelectorAll('button').forEach(btn => {
-            btn.disabled = true;
-            btn.style.backgroundColor = 'grey';
-        });
-    } else {
-        // Re-enable buttons in unselected rows if not conflicting
-        allRows.forEach(r => {
-            if (!selectedRows.has(r)) {
-                r.querySelectorAll('button').forEach(btn => {
-                    if (!selectedNumbers.has(btn.textContent) && !btn.classList.contains('active')) {
-                        btn.disabled = false;
-                        btn.style.backgroundColor = 'red';
+            // Grey out ONLY the unselected row when 2 selected
+            if (selectedRows.size === 2) {
+                const unselectedRow = allRows.find(r => !selectedRows.has(r));
+                unselectedRow.querySelectorAll('button').forEach(btn => {
+                    btn.disabled = true;
+                    btn.style.backgroundColor = 'grey';
+                });
+            }
+            // Reset if less than 2 selected
+            else {
+                allRows.forEach(r => {
+                    if (!selectedRows.has(r)) {
+                        r.querySelectorAll('button').forEach(btn => {
+                            if (!btn.disabled) {
+                                btn.style.backgroundColor = 'red';
+                            }
+                        });
                     }
                 });
             }
-        });
-    }
+        } else {
+            // Original 3x3 grid logic for other sections
+            const row = button.parentElement;
+            const colIndex = Array.from(row.children).indexOf(button) - 1;
 
-    updateAlgaeNetScoring();
-    saveSelections();
-};
+            row.querySelectorAll('button').forEach(btn => {
+                btn.classList.remove("active");
+                btn.style.backgroundColor = "red";
+            });
+
+            section.querySelectorAll(`.button-row button:nth-child(${colIndex + 2})`).forEach(btn => {
+                btn.classList.remove("active");
+                btn.style.backgroundColor = "red";
+            });
+
+            button.classList.add("active");
+            button.style.backgroundColor = "green";
+            selectedTeams[category] = localStorage.getItem(`teamNumber${teamIndex}`) || "N/A";
+        }
+
+        updateAlgaeNetScoring();
+        saveSelections();
+    };
+
 
         
     function initialize() {
@@ -628,7 +646,5 @@
 </script>
 </body>
 </html>
-
-
 
 
