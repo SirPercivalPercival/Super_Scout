@@ -33,21 +33,21 @@
     width: 100%;
     max-width: 1200px; 
     flex-wrap: wrap; 
-    gap: 2vh; 
+    gap: 1vh; 
     padding: 0;
 }
 
 
 .section {
     border: 2px solid black;
-    padding: 2vh; 
+    padding: 1vh; 
     background: white;
-    margin: 1vh; 
+    margin: 0.5vh; 
     box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2);
     border-radius: 10px;
     flex: 1 1 300px; 
-    min-height: 300px; 
-    max-height: 400px; 
+    min-height: 250px; 
+    max-height: 300px; 
     width: 100%; 
     box-sizing: border-box;
     overflow: auto; 
@@ -168,7 +168,8 @@
     }
 
     .section {
-        width: 90%; 
+        width: 98%; 
+        margin: 0.2vh
         max-width: none;
     }
 
@@ -338,71 +339,43 @@
 
         // Button selection logic
         window.selectButton = function(button, category, teamIndex) {
-            let buttons = button.parentElement.children;
-            for (let btn of buttons) {
-                btn.classList.remove("active");
-            }
-            button.classList.add("active");
-
-            let teamNumber = localStorage.getItem(`teamNumber${teamIndex}`) || "N/A";
-            selectedTeams[category] = teamNumber;
-
-            updateAlgaeNetScoring();
+    const selectedNumber = button.textContent;
+    const section = document.getElementById(category);
+    
+    // Disable same number in other rows
+    section.querySelectorAll(`.button-row button:not(.active)`).forEach(btn => {
+        if(btn.textContent === selectedNumber) {
+            btn.disabled = true;
+            btn.style.backgroundColor = "grey";
         }
+    });
 
-        function updateAlgaeNetScoring() {
-            let scoringSection = document.getElementById("scoring");
-            let algaeNetScoreText = document.getElementById("algae-net-score");
+    // Clear previous selection in current row
+    button.parentElement.querySelectorAll('button').forEach(btn => {
+        btn.classList.remove("active");
+        btn.style.backgroundColor = "red";
+    });
 
-            const teamNumber1 = localStorage.getItem("teamNumber1") || "N/A";
-            const teamNumber2 = localStorage.getItem("teamNumber2") || "N/A";
-            const teamNumber3 = localStorage.getItem("teamNumber3") || "N/A";
+    // Set new selection
+    button.classList.add("active");
+    button.style.backgroundColor = "green";
+    button.disabled = false;
 
-            let humanPlayerAwarenessButtons = document.querySelectorAll("#human-player-awareness .button-group button.active");
+    // Update team number tracking
+    let teamNumber = localStorage.getItem(`teamNumber${teamIndex}`) || "N/A";
+    selectedTeams[category] = teamNumber;
+    updateAlgaeNetScoring();
+};
 
-            if (humanPlayerAwarenessButtons.length === 2) {
-                let selectedRows = [];
-                humanPlayerAwarenessButtons.forEach(button => {
-                    let row = Math.floor(Array.from(button.parentElement.parentElement.children).indexOf(button.parentElement));
-                    selectedRows.push(row + 1);
-                });
-
-                let chosenTeam = "N/A";
-
-                if (selectedRows.includes(1) && selectedRows.includes(2)) {
-                    chosenTeam = teamNumber3;
-                } else if (selectedRows.includes(2) && selectedRows.includes(3)) {
-                    chosenTeam = teamNumber1;
-                } else if (selectedRows.includes(1) && selectedRows.includes(3)) {
-                    chosenTeam = teamNumber2;
-                }
-
-                if (!algaeNetScoreText) {
-                    algaeNetScoreText = document.createElement("p");
-                    algaeNetScoreText.id = "algae-net-score";
-                    scoringSection.appendChild(algaeNetScoreText);
-                }
-
-                algaeNetScoreText.textContent = `Team Number Chosen: ${chosenTeam}`;
-            } else {
-                if (!algaeNetScoreText) {
-                    algaeNetScoreText = document.createElement("p");
-                    algaeNetScoreText.id = "algae-net-score";
-                    scoringSection.appendChild(algaeNetScoreText);
-                }
-                algaeNetScoreText.textContent = "Team Number Chosen: N/A";
-            }
-        }
-
-        // Restart button logic
-        document.getElementById("restart-button").addEventListener("click", function () {
-            selectedTeams = {};
-            document.querySelectorAll(".button-group button").forEach(button => {
-                button.classList.remove("active");
-                button.style.backgroundColor = "red";
-                button.disabled = false;
-            });
-        });
+// Modified restart function
+document.getElementById("restart-button").addEventListener("click", function() {
+    document.querySelectorAll(".button-group button").forEach(btn => {
+        btn.classList.remove("active");
+        btn.style.backgroundColor = "red";
+        btn.disabled = false;
+    });
+    selectedTeams = {};
+});
 
         document.querySelectorAll(".button-group button").forEach(button => {
             button.addEventListener("click", function () {
