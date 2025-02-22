@@ -324,10 +324,9 @@
 
 
     <script>
-     document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function () {
     let usedRanks = {};
     let selectedTeams = {};
-    const columnStates = new Map();
 
     // Load team numbers
     const teamNumber1 = localStorage.getItem("teamNumber1") || "N/A";
@@ -341,73 +340,86 @@
 
     window.selectButton = function(button, category, teamIndex) {
         const section = document.getElementById(category);
-        const isHumanPlayer = category === 'human-player-awareness';
+        
+        if (category === 'human-player-awareness') {
+            // HUMAN PLAYER AWARENESS LOGIC
+            const row = button.parentElement;
+            const allRows = Array.from(section.querySelectorAll('.button-row'));
+            const allButtons = section.querySelectorAll('button');
+            
+            // Clear previous selection in this row
+            row.querySelectorAll('button').forEach(btn => {
+                btn.classList.remove('active');
+                btn.style.backgroundColor = 'red';
+            });
 
-        if (!isHumanPlayer) {
-            // 3x3 GRID LOGIC (Driver Awareness/Mobility/Defense)
+            // Toggle current button
+            button.classList.toggle('active');
+            button.style.backgroundColor = button.classList.contains('active') ? 'green' : 'red';
+
+            // Get selected numbers
+            const selectedNumbers = new Set(
+                Array.from(section.querySelectorAll('.active')).map(b => b.textContent)
+            );
+
+            // Get selected rows
+            const selectedRows = new Set(
+                Array.from(section.querySelectorAll('.active')).map(b => b.parentElement)
+            );
+
+            // Update button states
+            allButtons.forEach(btn => {
+                const btnRow = btn.parentElement;
+                const btnNumber = btn.textContent;
+                
+                if (btnRow !== row) {
+                    // Disable same numbers in other rows
+                    if (selectedNumbers.has(btnNumber)) {
+                        btn.disabled = true;
+                        btn.style.backgroundColor = 'grey';
+                    } else {
+                        btn.disabled = selectedRows.size >= 2 && !selectedRows.has(btnRow);
+                        btn.style.backgroundColor = btn.disabled ? 'grey' : 'red';
+                    }
+                }
+            });
+
+            // Grey out unselected row when two selected
+            if (selectedRows.size === 2) {
+                const unselectedRow = allRows.find(row => !selectedRows.has(row));
+                if (unselectedRow) {
+                    unselectedRow.querySelectorAll('button').forEach(btn => {
+                        btn.disabled = true;
+                        btn.style.backgroundColor = 'grey';
+                    });
+                }
+            }
+        } else {
+            // Original 3x3 grid logic for other sections
             const row = button.parentElement;
             const colIndex = Array.from(row.children).indexOf(button) - 1;
 
-            // Clear row
             row.querySelectorAll('button').forEach(btn => {
                 btn.classList.remove("active");
                 btn.style.backgroundColor = "red";
             });
 
-            // Clear column
             section.querySelectorAll(`.button-row button:nth-child(${colIndex + 2})`).forEach(btn => {
                 btn.classList.remove("active");
                 btn.style.backgroundColor = "red";
             });
 
-            // Set new selection
             button.classList.add("active");
             button.style.backgroundColor = "green";
             selectedTeams[category] = localStorage.getItem(`teamNumber${teamIndex}`) || "N/A";
-        } else {
-            // HUMAN PLAYER AWARENESS
-            const row = button.parentElement;
-            const buttonNumber = button.textContent;
-            const allButtons = section.querySelectorAll('.button-group button');
-            
-            // Clear row
-            row.querySelectorAll('button').forEach(btn => {
-                btn.classList.remove("active");
-                btn.style.backgroundColor = "red";
-            });
-
-            // Toggle current
-            const wasActive = button.classList.contains('active');
-            if (!wasActive) {
-                button.classList.add("active");
-                button.style.backgroundColor = "green";
-            }
-
-            // Get selected numbers
-            const selectedNumbers = new Set(
-                Array.from(section.querySelectorAll('.active'))
-                    .map(btn => btn.textContent)
-            );
-
-            // Update other rows
-            allButtons.forEach(btn => {
-                if (btn.parentElement !== row) {
-                    const btnNum = btn.textContent;
-                    btn.disabled = selectedNumbers.has(btnNum);
-                    btn.style.backgroundColor = btn.disabled ? "grey" : "red";
-                }
-            });
-
-            // Enforce max 2 selections
-            if (selectedNumbers.size > 2) {
-                button.classList.remove("active");
-                button.style.backgroundColor = "red";
-            }
         }
 
         updateAlgaeNetScoring();
         saveSelections();
     };
+
+
+        
     function initialize() {
         restoreSelections();
         restoreScoringData();
