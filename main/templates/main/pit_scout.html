@@ -340,79 +340,67 @@
 
         // Modified button selection logic
         window.selectButton = function(button, category, teamIndex) {
-            const section = document.getElementById(category);
-            const isHumanPlayer = category === 'human-player-awareness';
-            const buttonNumber = button.textContent;
+    const section = document.getElementById(category);
+    const isHumanPlayer = category === 'human-player-awareness';
+    const buttonNumber = button.textContent;
 
-            if (!isHumanPlayer) {
-                // For 3x3 grid sections
-                const row = button.parentElement;
-                const colIndex = Array.from(row.children).indexOf(button) - 1; // Subtract 1 for team number span
+    if (!isHumanPlayer) {
+        // For 3x3 grid sections
+        const row = button.parentElement;
+        const colIndex = Array.from(row.children).indexOf(button) - 1; // Subtract 1 for team number span
 
-                // Clear previous selections in this row
-                row.querySelectorAll('button').forEach(btn => {
-                    btn.classList.remove("active");
-                    btn.style.backgroundColor = "red";
-                });
+        // Clear previous selections in this row
+        row.querySelectorAll('button').forEach(btn => {
+            btn.classList.remove("active");
+            btn.style.backgroundColor = "red";
+        });
 
-                // Clear previous selections in this column
-                section.querySelectorAll(`.button-row button:nth-child(${colIndex + 2})`).forEach(btn => {
-                    btn.classList.remove("active");
-                    btn.style.backgroundColor = "red";
-                });
+        // Clear previous selections in this column
+        section.querySelectorAll(`.button-row button:nth-child(${colIndex + 2})`).forEach(btn => {
+            btn.classList.remove("active");
+            btn.style.backgroundColor = "red";
+        });
 
-                // Set new selection
-                button.classList.add("active");
-                button.style.backgroundColor = "green";
+        // Set new selection
+        button.classList.add("active");
+        button.style.backgroundColor = "green";
 
-                // Store selection
-                selectedTeams[category] = localStorage.getItem(`teamNumber${teamIndex}`) || "N/A";
-                 } else {
-                // Human Player Awareness specific logic
-                const buttons = section.querySelectorAll('.button-group button');
-                const activeButtons = Array.from(buttons).filter(btn => btn.classList.contains('active'));
-            
-                if (activeButtons.includes(button)) {
-                    // Deselect
-                    button.classList.remove("active");
-                    button.style.backgroundColor = "red";
-                } else if (activeButtons.length < 2) {
-                    // Select
-                    button.classList.add("active");
-                    button.style.backgroundColor = "green";
-                }
+        // Store selection
+        selectedTeams[category] = localStorage.getItem(`teamNumber${teamIndex}`) || "N/A";
+    } else {
+        // Human Player Awareness specific logic
+        const buttons = section.querySelectorAll('.button-group button');
+        const activeButtons = Array.from(buttons).filter(btn => btn.classList.contains('active'));
+        
+        if (activeButtons.includes(button)) {
+            // Deselect
+            button.classList.remove("active");
+            button.style.backgroundColor = "red";
+        } else if (activeButtons.length < 2) {
+            // Select
+            button.classList.add("active");
+            button.style.backgroundColor = "green";
+        }
 
-                // Apply grey state only to human player awareness
-                buttons.forEach(btn => {
-                    if (!btn.classList.contains('active') && activeButtons.length >= 2) {
-                        btn.style.backgroundColor = "grey";
-                        btn.disabled = true;
-                    } else {
-                        btn.disabled = false;
-                    }
-                });
-
-                // Immediately update UI state
-                handleHumanPlayerAwareness();
-                updateAlgaeNetScoring(); // Also update scoring display
-                saveSelections();
-            } 
-            
-                if (activeButtons.includes(button)) {
-                    // Deselect
-                    button.classList.remove("active");
-                    button.style.backgroundColor = "red";
-                } else if (activeButtons.length < 2) {
-                    // Select
-                    button.classList.add("active");
-                    button.style.backgroundColor = "green";
-                }
-
-                // Immediately update UI state
-                handleHumanPlayerAwareness();
-                updateAlgaeNetScoring(); // Also update scoring display
-                saveSelections();
+        // Apply grey state only to human player awareness
+        buttons.forEach(btn => {
+            if (!btn.classList.contains('active') && activeButtons.length >= 2) {
+                btn.style.backgroundColor = "grey";
+                btn.disabled = true;
+            } else {
+                btn.disabled = false;
             }
+        });
+
+        // Immediately update UI state
+        handleHumanPlayerAwareness();
+        updateAlgaeNetScoring(); // Also update scoring display
+        saveSelections();
+    }
+
+    updateAlgaeNetScoring();
+    saveSelections();
+};
                 if (activeButtons.includes(button)) {
                     // Deselect
                     button.classList.remove("active");
