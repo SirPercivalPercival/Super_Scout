@@ -368,25 +368,10 @@
                 // Store selection
                 selectedTeams[category] = localStorage.getItem(`teamNumber${teamIndex}`) || "N/A";
                 } else {
-                    // Human Player Awareness specific logic
-                    const buttons = section.querySelectorAll('.button-group button');
-                    const activeButtons = Array.from(buttons).filter(btn => btn.classList.contains('active'));
+                // Human Player Awareness specific logic
+                const buttons = section.querySelectorAll('.button-group button');
+                const activeButtons = Array.from(buttons).filter(btn => btn.classList.contains('active'));
 
-                if (activeButtons.includes(button)) {
-                        // Deselect
-                    button.classList.remove("active");
-                    button.style.backgroundColor = "red";
-                } else if (activeButtons.length < 2) {
-                    // Select
-                    button.classList.add("active");
-                    button.style.backgroundColor = "green";
-                }
-
-                // Immediately update UI state
-                handleHumanPlayerAwareness();
-                updateAlgaeNetScoring(); // Also update scoring display
-                saveSelections();
-            }
                 if (activeButtons.includes(button)) {
                     // Deselect
                     button.classList.remove("active");
