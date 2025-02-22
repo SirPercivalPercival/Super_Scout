@@ -342,57 +342,62 @@
         const section = document.getElementById(category);
         
         if (category === 'human-player-awareness') {
-            // HUMAN PLAYER AWARENESS LOGIC
             const row = button.parentElement;
             const allRows = Array.from(section.querySelectorAll('.button-row'));
             const allButtons = section.querySelectorAll('button');
             
-            // Clear previous selection in this row
+            // Clear current row
             row.querySelectorAll('button').forEach(btn => {
                 btn.classList.remove('active');
                 btn.style.backgroundColor = 'red';
             });
 
             // Toggle current button
+            const wasActive = button.classList.contains('active');
             button.classList.toggle('active');
             button.style.backgroundColor = button.classList.contains('active') ? 'green' : 'red';
 
-            // Get selected numbers
-            const selectedNumbers = new Set(
-                Array.from(section.querySelectorAll('.active')).map(b => b.textContent)
-            );
-
-            // Get selected rows
-            const selectedRows = new Set(
-                Array.from(section.querySelectorAll('.active')).map(b => b.parentElement)
-            );
+            // Get selected numbers and rows
+            const activeButtons = Array.from(section.querySelectorAll('.active'));
+            const selectedNumbers = new Set(activeButtons.map(b => b.textContent));
+            const selectedRows = new Set(activeButtons.map(b => b.parentElement));
 
             // Update button states
             allButtons.forEach(btn => {
                 const btnRow = btn.parentElement;
                 const btnNumber = btn.textContent;
                 
-                if (btnRow !== row) {
-                    // Disable same numbers in other rows
-                    if (selectedNumbers.has(btnNumber)) {
-                        btn.disabled = true;
-                        btn.style.backgroundColor = 'grey';
-                    } else {
-                        btn.disabled = selectedRows.size >= 2 && !selectedRows.has(btnRow);
-                        btn.style.backgroundColor = btn.disabled ? 'grey' : 'red';
-                    }
+                // Disable same numbers in other rows
+                if (btnRow !== row && selectedNumbers.has(btnNumber)) {
+                    btn.disabled = true;
+                    btn.style.backgroundColor = 'grey';
+                }
+                // Enable available numbers
+                else if (!btn.classList.contains('active')) {
+                    btn.disabled = false;
+                    btn.style.backgroundColor = 'red';
                 }
             });
 
-            // Grey out unselected row when two selected
+            // Grey out ONLY the unselected row when 2 selected
             if (selectedRows.size === 2) {
-                const unselectedRow = allRows.find(row => !selectedRows.has(row));
-                if (unselectedRow) {
-                    unselectedRow.querySelectorAll('button').forEach(btn => {
-                        btn.disabled = true;
-                        btn.style.backgroundColor = 'grey';
-                    });
-                }
+                const unselectedRow = allRows.find(r => !selectedRows.has(r));
+                unselectedRow.querySelectorAll('button').forEach(btn => {
+                    btn.disabled = true;
+                    btn.style.backgroundColor = 'grey';
+                });
+            }
+            // Reset if less than 2 selected
+            else {
+                allRows.forEach(r => {
+                    if (!selectedRows.has(r)) {
+                        r.querySelectorAll('button').forEach(btn => {
+                            if (!btn.disabled) {
+                                btn.style.backgroundColor = 'red';
+                            }
+                        });
+                    }
+                });
             }
         } else {
             // Original 3x3 grid logic for other sections
