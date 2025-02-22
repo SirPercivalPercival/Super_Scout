@@ -423,24 +423,51 @@
         });
 
         function handleHumanPlayerAwareness() {
-            const sectionId = 'human-player-awareness';
-            const buttons = document.querySelectorAll(`#${sectionId} .button-group button`);
-            const activeButtons = Array.from(buttons).filter(btn => btn.classList.contains("active"));
+    const sectionId = 'human-player-awareness';
+    const buttons = document.querySelectorAll(`#${sectionId} .button-group button`);
+    const activeButtons = Array.from(buttons).filter(btn => btn.classList.contains("active"));
+    
+    // Reset all buttons first
+    buttons.forEach(btn => {
+        btn.style.backgroundColor = "red";
+        btn.disabled = false;
+    });
 
-            // Apply grey effect only to unselected buttons when 2 are selected
-            buttons.forEach(btn => {
-                if (activeButtons.length === 2 && !btn.classList.contains('active')) {
-                    btn.style.backgroundColor = "grey";
-                    btn.disabled = true;
-                } else {
-                    btn.style.backgroundColor = "red";
-                    btn.disabled = false;
-                }
+    // Color active buttons green
+    activeButtons.forEach(btn => {
+        btn.style.backgroundColor = "green";
+    });
+
+    // Only apply grey effect when exactly 2 buttons are selected
+    if (activeButtons.length === 2) {
+        // Get the parent rows of active buttons
+        const selectedRows = activeButtons.map(btn => btn.parentElement);
+        
+        // Find all rows in the section
+        const allRows = Array.from(document.querySelectorAll(`#${sectionId} .button-row`));
+        
+        // Find the unselected row
+        const unselectedRow = allRows.find(row => !selectedRows.includes(row));
+        
+        if (unselectedRow) {
+            // Grey out all buttons in the unselected row
+            unselectedRow.querySelectorAll('button').forEach(btn => {
+                btn.style.backgroundColor = "grey";
+                btn.disabled = true;
             });
-
-            // Update algae net scoring when changes occur
-            updateAlgaeNetScoring();
         }
+    }
+
+    // If less than 2 selected, ensure all rows are enabled
+    if (activeButtons.length < 2) {
+        buttons.forEach(btn => {
+            btn.disabled = false;
+            if (!btn.classList.contains("active")) {
+                btn.style.backgroundColor = "red";
+            }
+        });
+    }
+}
 
         // ALGAE NET SCORING SPECIFIC FUNCTION
         function updateAlgaeNetScoring() {
