@@ -325,7 +325,7 @@
 
     <script>
      document.addEventListener("DOMContentLoaded", function () {
-    let usedRanks = {}; // ✅ Added declaration
+    let usedRanks = {};
     let selectedTeams = {};
     const columnStates = new Map();
 
@@ -339,59 +339,73 @@
     document.querySelectorAll("#team-number-2-display").forEach(span => span.textContent = teamNumber2);
     document.querySelectorAll("#team-number-3-display").forEach(span => span.textContent = teamNumber3);
 
-    // ✅ Corrected selectButton function
     window.selectButton = function(button, category, teamIndex) {
         const section = document.getElementById(category);
         const isHumanPlayer = category === 'human-player-awareness';
 
         if (!isHumanPlayer) {
+            // Existing 3x3 grid logic remains the same
             const row = button.parentElement;
             const colIndex = Array.from(row.children).indexOf(button) - 1;
 
-            // Clear row selections
             row.querySelectorAll('button').forEach(btn => {
                 btn.classList.remove("active");
                 btn.style.backgroundColor = "red";
             });
 
-            // Clear column selections
             section.querySelectorAll(`.button-row button:nth-child(${colIndex + 2})`).forEach(btn => {
                 btn.classList.remove("active");
                 btn.style.backgroundColor = "red";
             });
 
-            // Set new selection
             button.classList.add("active");
             button.style.backgroundColor = "green";
             selectedTeams[category] = localStorage.getItem(`teamNumber${teamIndex}`) || "N/A";
         } else {
-            const buttons = section.querySelectorAll('.button-group button');
-            const activeButtons = Array.from(buttons).filter(btn => btn.classList.contains('active'));
+            // MODIFIED HUMAN PLAYER AWARENESS LOGIC
+            const row = button.parentElement;
+            const buttonsInRow = row.querySelectorAll('button');
+            
+            // Clear other buttons in the same row
+            buttonsInRow.forEach(btn => {
+                btn.classList.remove("active");
+                btn.style.backgroundColor = "red";
+            });
 
-            if (activeButtons.includes(button)) {
-                button.classList.remove("active");
-                button.style.backgroundColor = "red";
-            } else if (activeButtons.length < 2) {
+            // Toggle current button
+            if (!button.classList.contains('active')) {
                 button.classList.add("active");
                 button.style.backgroundColor = "green";
             }
 
-            buttons.forEach(btn => {
-                if (!btn.classList.contains('active') && activeButtons.length >= 2) {
-                    btn.style.backgroundColor = "grey";
-                    btn.disabled = true;
-                } else {
+            // Get all active buttons across all rows
+            const allButtons = section.querySelectorAll('.button-group button');
+            const activeButtons = Array.from(allButtons).filter(btn => btn.classList.contains('active'));
+
+            // Disable remaining buttons when two rows are selected
+            if (activeButtons.length === 2) {
+                allButtons.forEach(btn => {
+                    if (!btn.classList.contains('active')) {
+                        btn.style.backgroundColor = "grey";
+                        btn.disabled = true;
+                    }
+                });
+            } else {
+                allButtons.forEach(btn => {
                     btn.disabled = false;
-                }
-            });
+                    if (!btn.classList.contains('active')) {
+                        btn.style.backgroundColor = "red";
+                    }
+                });
+            }
+
             handleHumanPlayerAwareness();
         }
 
         updateAlgaeNetScoring();
         saveSelections();
     };
-
-    // ✅ Added initialize function
+ 
     function initialize() {
         restoreSelections();
         restoreScoringData();
