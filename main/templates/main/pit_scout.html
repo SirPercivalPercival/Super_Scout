@@ -324,8 +324,9 @@
 
 
     <script>
-    document.addEventListener("DOMContentLoaded", function () {
+     document.addEventListener("DOMContentLoaded", function () {
         let selectedTeams = {};
+        const columnStates = new Map();
 
         // Load team numbers from localStorage
         const teamNumber1 = localStorage.getItem("teamNumber1") || "N/A";
@@ -337,157 +338,89 @@
         document.querySelectorAll("#team-number-2-display").forEach(span => span.textContent = teamNumber2);
         document.querySelectorAll("#team-number-3-display").forEach(span => span.textContent = teamNumber3);
 
-        // Button selection logic
+        // Modified button selection logic
         window.selectButton = function(button, category, teamIndex) {
-            let buttons = button.parentElement.children;
-            for (let btn of buttons) {
-                btn.classList.remove("active");
-            }
-            button.classList.add("active");
+            const section = document.getElementById(category);
+            const isHumanPlayer = category === 'human-player-awareness';
+            const buttonNumber = button.textContent;
 
-            let teamNumber = localStorage.getItem(`teamNumber${teamIndex}`) || "N/A";
-            selectedTeams[category] = teamNumber;
+            if (!isHumanPlayer) {
+                // For 3x3 grid sections
+                const row = button.parentElement;
+                const colIndex = Array.from(row.children).indexOf(button) - 1; // Subtract 1 for team number span
 
-            updateAlgaeNetScoring();
-        }
-
-        function updateAlgaeNetScoring() {
-            let scoringSection = document.getElementById("scoring");
-            let algaeNetScoreText = document.getElementById("algae-net-score");
-
-            const teamNumber1 = localStorage.getItem("teamNumber1") || "N/A";
-            const teamNumber2 = localStorage.getItem("teamNumber2") || "N/A";
-            const teamNumber3 = localStorage.getItem("teamNumber3") || "N/A";
-
-            let humanPlayerAwarenessButtons = document.querySelectorAll("#human-player-awareness .button-group button.active");
-
-            if (humanPlayerAwarenessButtons.length === 2) {
-                let selectedRows = [];
-                humanPlayerAwarenessButtons.forEach(button => {
-                    let row = Math.floor(Array.from(button.parentElement.parentElement.children).indexOf(button.parentElement));
-                    selectedRows.push(row + 1);
+                // Clear previous selections in this row
+                row.querySelectorAll('button').forEach(btn => {
+                    btn.classList.remove("active");
+                    btn.style.backgroundColor = "red";
                 });
 
-                let chosenTeam = "N/A";
+                // Clear previous selections in this column
+                section.querySelectorAll(`.button-row button:nth-child(${colIndex + 2})`).forEach(btn => {
+                    btn.classList.remove("active");
+                    btn.style.backgroundColor = "red";
+                });
 
-                if (selectedRows.includes(1) && selectedRows.includes(2)) {
-                    chosenTeam = teamNumber3;
-                } else if (selectedRows.includes(2) && selectedRows.includes(3)) {
-                    chosenTeam = teamNumber1;
-                } else if (selectedRows.includes(1) && selectedRows.includes(3)) {
-                    chosenTeam = teamNumber2;
-                }
+                // Set new selection
+                button.classList.add("active");
+                button.style.backgroundColor = "green";
 
-                if (!algaeNetScoreText) {
-                    algaeNetScoreText = document.createElement("p");
-                    algaeNetScoreText.id = "algae-net-score";
-                    scoringSection.appendChild(algaeNetScoreText);
-                }
-
-                algaeNetScoreText.textContent = `Team Number Chosen: ${chosenTeam}`;
+                // Store selection
+                selectedTeams[category] = localStorage.getItem(`teamNumber${teamIndex}`) || "N/A";
             } else {
-                if (!algaeNetScoreText) {
-                    algaeNetScoreText = document.createElement("p");
-                    algaeNetScoreText.id = "algae-net-score";
-                    scoringSection.appendChild(algaeNetScoreText);
-                }
-                algaeNetScoreText.textContent = "Team Number Chosen: N/A";
-            }
-        }
+                // Human Player Awareness specific logic
+                const buttons = section.querySelectorAll('.button-group button');
+                const activeButtons = Array.from(buttons).filter(btn => btn.classList.contains('active'));
 
-        // Restart button logic
-        document.getElementById("restart-button").addEventListener("click", function () {
-            selectedTeams = {};
-            document.querySelectorAll(".button-group button").forEach(button => {
-                button.classList.remove("active");
-                button.style.backgroundColor = "red";
-                button.disabled = false;
-            });
-        });
-
-        document.querySelectorAll(".button-group button").forEach(button => {
-            button.addEventListener("click", function () {
-                let category = button.closest(".section").id;
-                let teamIndex = [...button.parentElement.children].indexOf(button) + 1;
-                selectButton(button, category, teamIndex);
-            });
-        });
-
-        let usedRanks = {};
-
-        function initialize() {
-            const sections = ['driver-awareness', 'mobility', 'defense', 'human-player-awareness'];
-            sections.forEach(section => {
-                usedRanks[section] = {};
-            });
-            restoreSelections();
-            restoreScoringData();
-        }
-
-        function selectButton(button, sectionId, number) {
-            const buttons = document.querySelectorAll(`#${sectionId} .button-group button`);
-
-            if (sectionId === 'human-player-awareness') {
-                if (!usedRanks[sectionId]) {
-                    usedRanks[sectionId] = {};
-                }
-
-                if (usedRanks[sectionId][number]) {
+                if (activeButtons.includes(button)) {
+                    // Deselect
                     button.classList.remove("active");
                     button.style.backgroundColor = "red";
-                    delete usedRanks[sectionId][number];
-                } else {
-                    const selectedKeys = Object.keys(usedRanks[sectionId] || {});
-
-                    if (selectedKeys.length >= 2) return;
-
-                    buttons.forEach(btn => {
-                        if (btn.textContent === button.textContent && btn.classList.contains("active")) {
-                            btn.classList.remove("active");
-                            btn.style.backgroundColor = "red";
-                            delete usedRanks[sectionId][btn.textContent];
-                        }
-                    });
-
+                } else if (activeButtons.length < 2) {
+                    // Select
                     button.classList.add("active");
                     button.style.backgroundColor = "green";
-                    usedRanks[sectionId][number] = true;
                 }
 
-                handleHumanPlayerAwareness();
-                saveSelections();
-                return;
+                // Apply grey state only to human player awareness
+                buttons.forEach(btn => {
+                    if (!btn.classList.contains('active') && activeButtons.length >= 2) {
+                        btn.style.backgroundColor = "grey";
+                        btn.disabled = true;
+                    } else {
+                        btn.disabled = false;
+                    }
+                });
             }
 
-            const level = Math.floor(Array.from(buttons).indexOf(button) / 3) + 1;
-            const levelButtons = Array.from(buttons).slice((level - 1) * 3, level * 3);
+            updateAlgaeNetScoring();
+            saveSelections();
+        };
 
-            levelButtons.forEach(btn => {
+        // Restart button logic (Human Player Awareness only)
+        document.getElementById("restart-button").addEventListener("click", function () {
+            const sectionId = 'human-player-awareness';
+            const section = document.getElementById(sectionId);
+            
+            // Reset UI
+            section.querySelectorAll('.button-group button').forEach(btn => {
                 btn.classList.remove("active");
                 btn.style.backgroundColor = "red";
-                delete usedRanks[sectionId]?.[btn.textContent];
+                btn.disabled = false;
             });
 
-            const columnIndex = (number - 1);
-            for (let i = 0; i < 3; i++) {
-                const verticalButton = buttons[i * 3 + columnIndex];
-                if (verticalButton && verticalButton !== button) {
-                    verticalButton.classList.remove("active");
-                    verticalButton.style.backgroundColor = "red";
-                    delete usedRanks[sectionId]?.[verticalButton.textContent];
-                }
+            // Reset data
+            delete selectedTeams[sectionId];
+            if(usedRanks[sectionId]) usedRanks[sectionId] = {};
+            
+            // Update display
+            const algaeNetScoreText = document.getElementById("algae-net-score");
+            if(algaeNetScoreText) {
+                algaeNetScoreText.textContent = "Team Number Chosen: N/A";
             }
-
-            button.classList.add("active");
-            button.style.backgroundColor = "green";
-
-            if (!usedRanks[sectionId]) {
-                usedRanks[sectionId] = {};
-            }
-            usedRanks[sectionId][number] = true;
-
+            
             saveSelections();
-        }
+        });
 
         function handleHumanPlayerAwareness() {
             const sectionId = 'human-player-awareness';
