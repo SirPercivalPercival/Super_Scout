@@ -367,11 +367,26 @@
 
                 // Store selection
                 selectedTeams[category] = localStorage.getItem(`teamNumber${teamIndex}`) || "N/A";
-            } else {
-                // Human Player Awareness specific logic
-                const buttons = section.querySelectorAll('.button-group button');
-                const activeButtons = Array.from(buttons).filter(btn => btn.classList.contains('active'));
+                } else {
+                    // Human Player Awareness specific logic
+                    const buttons = section.querySelectorAll('.button-group button');
+                    const activeButtons = Array.from(buttons).filter(btn => btn.classList.contains('active'));
 
+                if (activeButtons.includes(button)) {
+                        // Deselect
+                    button.classList.remove("active");
+                    button.style.backgroundColor = "red";
+                } else if (activeButtons.length < 2) {
+                    // Select
+                    button.classList.add("active");
+                    button.style.backgroundColor = "green";
+                }
+
+                // Immediately update UI state
+                handleHumanPlayerAwareness();
+                updateAlgaeNetScoring(); // Also update scoring display
+                saveSelections();
+            }
                 if (activeButtons.includes(button)) {
                     // Deselect
                     button.classList.remove("active");
@@ -429,34 +444,32 @@
     
     // Reset all buttons first
     buttons.forEach(btn => {
-        btn.style.backgroundColor = "red";
-        btn.disabled = false;
+        if (!btn.classList.contains('active')) {
+            btn.style.backgroundColor = "red";
+            btn.disabled = false;
+        }
     });
 
-    // Color active buttons green
-    activeButtons.forEach(btn => {
-        btn.style.backgroundColor = "green";
-    });
-
-    // Only apply grey effect when exactly 2 buttons are selected
+    // If two buttons selected
     if (activeButtons.length === 2) {
-        // Get the parent rows of active buttons
-        const selectedRows = activeButtons.map(btn => btn.parentElement);
+        // Get selected rows
+        const selectedRows = [...new Set(activeButtons.map(btn => 
+            btn.closest('.button-row')
+        ))];
         
-        // Find all rows in the section
+        // Find unselected row
         const allRows = Array.from(document.querySelectorAll(`#${sectionId} .button-row`));
-        
-        // Find the unselected row
         const unselectedRow = allRows.find(row => !selectedRows.includes(row));
         
+        // Grey out unselected row
         if (unselectedRow) {
-            // Grey out all buttons in the unselected row
             unselectedRow.querySelectorAll('button').forEach(btn => {
                 btn.style.backgroundColor = "grey";
                 btn.disabled = true;
             });
         }
     }
+}
 
     // If less than 2 selected, ensure all rows are enabled
     if (activeButtons.length < 2) {
