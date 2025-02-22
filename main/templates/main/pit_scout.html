@@ -344,59 +344,57 @@
         const isHumanPlayer = category === 'human-player-awareness';
 
         if (!isHumanPlayer) {
-            // Existing 3x3 grid logic remains the same
+            // ... [keep existing 3x3 grid logic] ...
+        } else {
+            // HUMAN PLAYER AWARENESS LOGIC
             const row = button.parentElement;
-            const colIndex = Array.from(row.children).indexOf(button) - 1;
-
+            const buttonNumber = button.textContent;
+            const allButtons = section.querySelectorAll('.button-group button');
+            
+            // Clear other buttons in the same row
             row.querySelectorAll('button').forEach(btn => {
                 btn.classList.remove("active");
                 btn.style.backgroundColor = "red";
             });
 
-            section.querySelectorAll(`.button-row button:nth-child(${colIndex + 2})`).forEach(btn => {
-                btn.classList.remove("active");
-                btn.style.backgroundColor = "red";
-            });
-
-            button.classList.add("active");
-            button.style.backgroundColor = "green";
-            selectedTeams[category] = localStorage.getItem(`teamNumber${teamIndex}`) || "N/A";
-        } else {
-            // MODIFIED HUMAN PLAYER AWARENESS LOGIC
-            const row = button.parentElement;
-            const buttonsInRow = row.querySelectorAll('button');
-            
-            // Clear other buttons in the same row
-            buttonsInRow.forEach(btn => {
-                btn.classList.remove("active");
-                btn.style.backgroundColor = "red";
-            });
-
             // Toggle current button
-            if (!button.classList.contains('active')) {
+            const wasActive = button.classList.contains('active');
+            if (!wasActive) {
                 button.classList.add("active");
                 button.style.backgroundColor = "green";
+            } else {
+                button.classList.remove("active");
+                button.style.backgroundColor = "red";
             }
 
-            // Get all active buttons across all rows
-            const allButtons = section.querySelectorAll('.button-group button');
-            const activeButtons = Array.from(allButtons).filter(btn => btn.classList.contains('active'));
+            // Get all selected numbers
+            const selectedNumbers = new Set(
+                Array.from(section.querySelectorAll('.active'))
+                    .map(btn => btn.textContent)
+            );
 
-            // Disable remaining buttons when two rows are selected
-            if (activeButtons.length === 2) {
-                allButtons.forEach(btn => {
-                    if (!btn.classList.contains('active')) {
-                        btn.style.backgroundColor = "grey";
+            // Update button availability
+            allButtons.forEach(btn => {
+                const btnRow = btn.parentElement;
+                const btnNumber = btn.textContent;
+                
+                if (btnRow !== row) { // Only affect other rows
+                    if (selectedNumbers.has(btnNumber)) {
+                        // Disable same number in other rows
                         btn.disabled = true;
+                        btn.style.backgroundColor = "grey";
+                    } else {
+                        // Only enable if under max selections
+                        btn.disabled = selectedNumbers.size >= 2;
+                        btn.style.backgroundColor = btn.disabled ? "grey" : "red";
                     }
-                });
-            } else {
-                allButtons.forEach(btn => {
-                    btn.disabled = false;
-                    if (!btn.classList.contains('active')) {
-                        btn.style.backgroundColor = "red";
-                    }
-                });
+                }
+            });
+
+            // Enforce max 2 selections
+            if (selectedNumbers.size > 2) {
+                button.classList.remove("active");
+                button.style.backgroundColor = "red";
             }
 
             handleHumanPlayerAwareness();
