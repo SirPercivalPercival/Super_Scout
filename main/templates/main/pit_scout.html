@@ -324,10 +324,8 @@
 
 
     <script>
-
     document.addEventListener("DOMContentLoaded", function () {
         let selectedTeams = {};
-        const numberStates = new Map();
 
         // Load team numbers from localStorage
         const teamNumber1 = localStorage.getItem("teamNumber1") || "N/A";
@@ -341,31 +339,17 @@
 
         // Button selection logic
         window.selectButton = function(button, category, teamIndex) {
-            const section = document.getElementById(category);
-            const selectedNumber = button.textContent;
-            
-            // Clear previous selection in this row
-            button.parentElement.querySelectorAll('button').forEach(btn => {
+            let buttons = button.parentElement.children;
+            for (let btn of buttons) {
                 btn.classList.remove("active");
-                btn.style.backgroundColor = "red";
-            });
-
-            // Disable same number in other rows of this section
-            section.querySelectorAll(`.button-row button`).forEach(btn => {
-                if(btn.textContent === selectedNumber && btn !== button) {
-                    btn.disabled = true;
-                    btn.style.backgroundColor = "grey";
-                }
-            });
-
-            // Set active state
+            }
             button.classList.add("active");
-            button.style.backgroundColor = "green";
-            selectedTeams[category] = localStorage.getItem(`teamNumber${teamIndex}`) || "N/A";
+
+            let teamNumber = localStorage.getItem(`teamNumber${teamIndex}`) || "N/A";
+            selectedTeams[category] = teamNumber;
 
             updateAlgaeNetScoring();
-            saveSelections();
-        };
+        }
 
         function updateAlgaeNetScoring() {
             let scoringSection = document.getElementById("scoring");
@@ -411,31 +395,16 @@
             }
         }
 
-        // Restart button logic (Human Player Awareness only)
+        // Restart button logic
         document.getElementById("restart-button").addEventListener("click", function () {
-            const sectionId = 'human-player-awareness';
-            
-            // Reset UI
-            document.querySelectorAll(`#${sectionId} .button-group button`).forEach(btn => {
-                btn.classList.remove("active");
-                btn.style.backgroundColor = "red";
-                btn.disabled = false;
+            selectedTeams = {};
+            document.querySelectorAll(".button-group button").forEach(button => {
+                button.classList.remove("active");
+                button.style.backgroundColor = "red";
+                button.disabled = false;
             });
-
-            // Reset data
-            delete selectedTeams[sectionId];
-            if(usedRanks[sectionId]) usedRanks[sectionId] = {};
-            
-            // Update display
-            const algaeNetScoreText = document.getElementById("algae-net-score");
-            if(algaeNetScoreText) {
-                algaeNetScoreText.textContent = "Team Number Chosen: N/A";
-            }
-            
-            saveSelections();
         });
 
-        // Initialize button states
         document.querySelectorAll(".button-group button").forEach(button => {
             button.addEventListener("click", function () {
                 let category = button.closest(".section").id;
@@ -459,7 +428,9 @@
             const buttons = document.querySelectorAll(`#${sectionId} .button-group button`);
 
             if (sectionId === 'human-player-awareness') {
-                if (!usedRanks[sectionId]) usedRanks[sectionId] = {};
+                if (!usedRanks[sectionId]) {
+                    usedRanks[sectionId] = {};
+                }
 
                 if (usedRanks[sectionId][number]) {
                     button.classList.remove("active");
@@ -467,6 +438,7 @@
                     delete usedRanks[sectionId][number];
                 } else {
                     const selectedKeys = Object.keys(usedRanks[sectionId] || {});
+
                     if (selectedKeys.length >= 2) return;
 
                     buttons.forEach(btn => {
@@ -508,13 +480,14 @@
 
             button.classList.add("active");
             button.style.backgroundColor = "green";
-            if (!usedRanks[sectionId]) usedRanks[sectionId] = {};
+
+            if (!usedRanks[sectionId]) {
+                usedRanks[sectionId] = {};
+            }
             usedRanks[sectionId][number] = true;
 
             saveSelections();
         }
-
-        
 
         function handleHumanPlayerAwareness() {
             const sectionId = 'human-player-awareness';
