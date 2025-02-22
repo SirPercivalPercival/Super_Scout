@@ -429,30 +429,43 @@
     
     // Reset all buttons first
     buttons.forEach(btn => {
-        if (!btn.classList.contains('active')) {
-            btn.style.backgroundColor = "red";
-            btn.disabled = false;
-        }
+        btn.style.backgroundColor = "red";
+        btn.disabled = false;
     });
 
-    // If two buttons selected
+    // Color active buttons green
+    activeButtons.forEach(btn => {
+        btn.style.backgroundColor = "green";
+    });
+
+    // Only apply grey effect when exactly 2 buttons are selected
     if (activeButtons.length === 2) {
-        // Get selected rows
-        const selectedRows = [...new Set(activeButtons.map(btn => 
-            btn.closest('.button-row')
-        ))];
+        // Get the parent rows of active buttons
+        const selectedRows = activeButtons.map(btn => btn.parentElement);
         
-        // Find unselected row
+        // Find all rows in the section
         const allRows = Array.from(document.querySelectorAll(`#${sectionId} .button-row`));
+        
+        // Find the unselected row
         const unselectedRow = allRows.find(row => !selectedRows.includes(row));
         
-        // Grey out unselected row
         if (unselectedRow) {
+            // Grey out all buttons in the unselected row
             unselectedRow.querySelectorAll('button').forEach(btn => {
                 btn.style.backgroundColor = "grey";
                 btn.disabled = true;
             });
         }
+    }
+
+    // If less than 2 selected, ensure all rows are enabled
+    if (activeButtons.length < 2) {
+        buttons.forEach(btn => {
+            btn.disabled = false;
+            if (!btn.classList.contains("active")) {
+                btn.style.backgroundColor = "red";
+            }
+        });
     }
 }
 
