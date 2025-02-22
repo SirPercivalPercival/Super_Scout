@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -371,7 +371,22 @@
                 // Human Player Awareness specific logic
                 const buttons = section.querySelectorAll('.button-group button');
                 const activeButtons = Array.from(buttons).filter(btn => btn.classList.contains('active'));
+            
+                if (activeButtons.includes(button)) {
+                    // Deselect
+                    button.classList.remove("active");
+                    button.style.backgroundColor = "red";
+                } else if (activeButtons.length < 2) {
+                    // Select
+                    button.classList.add("active");
+                    button.style.backgroundColor = "green";
+                }
 
+                // Immediately update UI state
+                handleHumanPlayerAwareness();
+                updateAlgaeNetScoring(); // Also update scoring display
+                saveSelections();
+            }
                 if (activeButtons.includes(button)) {
                     // Deselect
                     button.classList.remove("active");
@@ -423,20 +438,38 @@
         });
 
         function handleHumanPlayerAwareness() {
-            const sectionId = 'human-player-awareness';
-            const buttons = document.querySelectorAll(`#${sectionId} .button-group button`);
-            const activeButtons = Array.from(buttons).filter(btn => btn.classList.contains("active"));
+    const sectionId = 'human-player-awareness';
+    const buttons = document.querySelectorAll(`#${sectionId} .button-group button`);
+    const activeButtons = Array.from(buttons).filter(btn => btn.classList.contains("active"));
+    
+    // Reset all buttons first
+    buttons.forEach(btn => {
+        if (!btn.classList.contains('active')) {
+            btn.style.backgroundColor = "red";
+            btn.disabled = false;
+        }
+    });
 
-            // Apply grey effect only to unselected buttons when 2 are selected
-            buttons.forEach(btn => {
-                if (activeButtons.length === 2 && !btn.classList.contains('active')) {
-                    btn.style.backgroundColor = "grey";
-                    btn.disabled = true;
-                } else {
-                    btn.style.backgroundColor = "red";
-                    btn.disabled = false;
-                }
+    // If two buttons selected
+    if (activeButtons.length === 2) {
+        // Get selected rows
+        const selectedRows = [...new Set(activeButtons.map(btn => 
+            btn.closest('.button-row')
+        ))];
+        
+        // Find unselected row
+        const allRows = Array.from(document.querySelectorAll(`#${sectionId} .button-row`));
+        const unselectedRow = allRows.find(row => !selectedRows.includes(row));
+        
+        // Grey out unselected row
+        if (unselectedRow) {
+            unselectedRow.querySelectorAll('button').forEach(btn => {
+                btn.style.backgroundColor = "grey";
+                btn.disabled = true;
             });
+        }
+    }
+        }
 
             // Update algae net scoring when changes occur
             updateAlgaeNetScoring();
