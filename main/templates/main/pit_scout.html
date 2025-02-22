@@ -344,50 +344,57 @@
         const isHumanPlayer = category === 'human-player-awareness';
 
         if (!isHumanPlayer) {
-            // ... [keep existing 3x3 grid logic] ...
-        } else {
-            // HUMAN PLAYER AWARENESS LOGIC
+            // 3x3 GRID LOGIC (Driver Awareness/Mobility/Defense)
             const row = button.parentElement;
-            const buttonNumber = button.textContent;
-            const allButtons = section.querySelectorAll('.button-group button');
-            
-            // Clear other buttons in the same row
+            const colIndex = Array.from(row.children).indexOf(button) - 1;
+
+            // Clear row
             row.querySelectorAll('button').forEach(btn => {
                 btn.classList.remove("active");
                 btn.style.backgroundColor = "red";
             });
 
-            // Toggle current button
+            // Clear column
+            section.querySelectorAll(`.button-row button:nth-child(${colIndex + 2})`).forEach(btn => {
+                btn.classList.remove("active");
+                btn.style.backgroundColor = "red";
+            });
+
+            // Set new selection
+            button.classList.add("active");
+            button.style.backgroundColor = "green";
+            selectedTeams[category] = localStorage.getItem(`teamNumber${teamIndex}`) || "N/A";
+        } else {
+            // HUMAN PLAYER AWARENESS
+            const row = button.parentElement;
+            const buttonNumber = button.textContent;
+            const allButtons = section.querySelectorAll('.button-group button');
+            
+            // Clear row
+            row.querySelectorAll('button').forEach(btn => {
+                btn.classList.remove("active");
+                btn.style.backgroundColor = "red";
+            });
+
+            // Toggle current
             const wasActive = button.classList.contains('active');
             if (!wasActive) {
                 button.classList.add("active");
                 button.style.backgroundColor = "green";
-            } else {
-                button.classList.remove("active");
-                button.style.backgroundColor = "red";
             }
 
-            // Get all selected numbers
+            // Get selected numbers
             const selectedNumbers = new Set(
                 Array.from(section.querySelectorAll('.active'))
                     .map(btn => btn.textContent)
             );
 
-            // Update button availability
+            // Update other rows
             allButtons.forEach(btn => {
-                const btnRow = btn.parentElement;
-                const btnNumber = btn.textContent;
-                
-                if (btnRow !== row) { // Only affect other rows
-                    if (selectedNumbers.has(btnNumber)) {
-                        // Disable same number in other rows
-                        btn.disabled = true;
-                        btn.style.backgroundColor = "grey";
-                    } else {
-                        // Only enable if under max selections
-                        btn.disabled = selectedNumbers.size >= 2;
-                        btn.style.backgroundColor = btn.disabled ? "grey" : "red";
-                    }
+                if (btn.parentElement !== row) {
+                    const btnNum = btn.textContent;
+                    btn.disabled = selectedNumbers.has(btnNum);
+                    btn.style.backgroundColor = btn.disabled ? "grey" : "red";
                 }
             });
 
@@ -396,14 +403,11 @@
                 button.classList.remove("active");
                 button.style.backgroundColor = "red";
             }
-
-            handleHumanPlayerAwareness();
         }
 
         updateAlgaeNetScoring();
         saveSelections();
     };
- 
     function initialize() {
         restoreSelections();
         restoreScoringData();
