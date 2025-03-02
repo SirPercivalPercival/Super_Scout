@@ -324,22 +324,21 @@
         </div>
 
     <script>
-// Modify the QR code button click handler
 document.getElementById("qrcode-button").addEventListener("click", function(event) {
     event.preventDefault();
     
-    // Get algae net team number from display
-    const algaeNetTeam = document.getElementById("algae-net-score").textContent
-                         .replace("Team Number Chosen: ", "") || "N/A";
+    // Get match number
+    const matchNumber = document.getElementById("match-number").value || "N/A";
 
-    // Collect all data with proper team numbers
+    // Collect all data
     const dataToStore = {
         driverAwareness: getSectionData('driver-awareness'),
         mobility: getSectionData('mobility'),
         defense: getSectionData('defense'),
         humanPlayerAwareness: getHumanPlayerData(),
         algaeNetScoring: {
-            teamNumber: algaeNetTeam,
+            teamNumber: document.getElementById("algae-net-score").textContent
+                         .replace("Team Number Chosen: ", "") || "N/A",
             successfullyScored: document.getElementById("successfully-scored").value,
             totalAttempts: document.getElementById("total-attempts").value,
             successRate: document.getElementById("success-rate").value
@@ -349,16 +348,26 @@ document.getElementById("qrcode-button").addEventListener("click", function(even
             team2: localStorage.getItem("teamNumber2"),
             team3: localStorage.getItem("teamNumber3")
         },
+        matchNumber: matchNumber,
         timestamp: new Date().toISOString()
     };
 
-    // Stringify the data for QR code
-    const dataString = JSON.stringify(dataToStore, null, 2);
-    
+    // Compress data using MessagePack
+    const compressedData = msgpack.encode(dataToStore);
+
+    // Save to QR code history
+    const qrCodeHistory = JSON.parse(localStorage.getItem("qrCodeHistory") || [];
+    qrCodeHistory.push({
+        matchNumber: matchNumber,
+        data: Array.from(compressedData), // Store as array for JSON compatibility
+        timestamp: new Date().toISOString()
+    });
+    localStorage.setItem("qrCodeHistory", JSON.stringify(qrCodeHistory));
+
     // Generate QR code
     const qrContainer = document.createElement("div");
     new QRCode(qrContainer, {
-        text: dataString,
+        text: JSON.stringify(dataToStore), // Display uncompressed data for readability
         width: 256,
         height: 256,
         colorDark: "#000000",
@@ -378,10 +387,10 @@ document.getElementById("qrcode-button").addEventListener("click", function(even
                 </style>
             </head>
             <body>
-                <h2>Scouting Data</h2>
+                <h2>Scouting Data (Match ${matchNumber})</h2>
                 <div id="qrcode"></div>
                 <h3>Raw Data:</h3>
-                <pre>${dataString}</pre>
+                <pre>${JSON.stringify(dataToStore, null, 2)}</pre>
             </body>
         </html>
     `);
