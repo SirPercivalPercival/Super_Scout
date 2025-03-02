@@ -369,12 +369,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Save to QR code history
         const qrCodeHistory = JSON.parse(localStorage.getItem("qrCodeHistory") || []);
-        qrCodeHistory.push({
-            matchNumber: matchNumber,
-            data: Array.from(compressedData), // Store as array for JSON compatibility
-            timestamp: new Date().toISOString()
-        });
-        localStorage.setItem("qrCodeHistory", JSON.stringify(qrCodeHistory));
+qrCodeHistory.push({
+    matchNumber: matchNumber,
+    data: dataToStore, // Store uncompressed data for debugging
+    timestamp: new Date().toISOString()
+});
+localStorage.setItem("qrCodeHistory", JSON.stringify(qrCodeHistory));
+
+// Log the saved data for debugging
+console.log("QR Code History Saved:", qrCodeHistory);
 
         // Generate QR code
         const qrContainer = document.createElement("div");
