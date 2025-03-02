@@ -325,6 +325,8 @@
 
     <script>
 document.addEventListener("DOMContentLoaded", function () {
+    console.log("DOM fully loaded!");
+
     // Ensure the QR code button exists
     const qrcodeButton = document.getElementById("qrcode-button");
     if (!qrcodeButton) {
@@ -336,13 +338,9 @@ document.addEventListener("DOMContentLoaded", function () {
     qrcodeButton.addEventListener("click", function(event) {
         event.preventDefault();
 
-        // Get match number
-        const matchNumberInput = document.getElementById("match-number");
-        if (!matchNumberInput) {
-            alert("Match number input not found!");
-            return;
-        }
-        const matchNumber = matchNumberInput.value || "N/A";
+        // Get match number from localStorage
+        const matchNumber = localStorage.getItem("matchNumber") || "N/A";
+        console.log("Match number retrieved from localStorage:", matchNumber);
 
         // Collect all data
         const dataToStore = {
