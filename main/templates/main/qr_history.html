@@ -113,6 +113,8 @@
             historyContainer.innerHTML = '';
 
             const qrCodeHistory = getStoredData();
+            console.log("QR Code History Retrieved:", qrCodeHistory); // Log retrieved data
+
             qrCodeHistory.forEach((entry, index) => {
                 // Decompress data
                 const decompressedData = msgpack.decode(new Uint8Array(entry.data));
@@ -124,7 +126,7 @@
                 const qrCanvas = document.createElement('canvas');
                 new QRious({
                     element: qrCanvas,
-                    value: JSON.stringify(decompressedData),
+                    value: JSON.stringify(decompressedData), // Use decompressed data
                     size: 150
                 });
 
