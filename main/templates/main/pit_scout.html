@@ -326,13 +326,18 @@
 document.getElementById("qrcode-button").addEventListener("click", function(event) {
     event.preventDefault();
     
-    // Collect all data
+    // Get algae net team number from display
+    const algaeNetTeam = document.getElementById("algae-net-score").textContent
+                         .replace("Team Number Chosen: ", "") || "N/A";
+
+    // Collect all data with proper team numbers
     const dataToStore = {
         driverAwareness: getSectionData('driver-awareness'),
         mobility: getSectionData('mobility'),
         defense: getSectionData('defense'),
         humanPlayerAwareness: getHumanPlayerData(),
         algaeNetScoring: {
+            teamNumber: algaeNetTeam,
             successfullyScored: document.getElementById("successfully-scored").value,
             totalAttempts: document.getElementById("total-attempts").value,
             successRate: document.getElementById("success-rate").value
@@ -386,22 +391,23 @@ function getSectionData(sectionId) {
     const section = document.getElementById(sectionId);
     const data = {};
     section.querySelectorAll('.button-row').forEach((row, index) => {
-        const teamKey = `team${index + 1}`;
+        const teamNumber = localStorage.getItem(`teamNumber${index + 1}`) || "N/A";
         const activeButton = row.querySelector('button.active');
-        data[teamKey] = activeButton ? activeButton.textContent : "N/A";
+        data[`team ${teamNumber}`] = activeButton ? activeButton.textContent : "N/A";
     });
     return data;
 }
 
-// Helper function for human player awareness data
+// Modified helper function for human player awareness data
 function getHumanPlayerData() {
     const section = document.getElementById('human-player-awareness');
     const activeButtons = Array.from(section.querySelectorAll('button.active'));
     return activeButtons.map(button => {
         const teamIndex = Array.from(button.closest('.button-row').parentElement.children)
                            .indexOf(button.closest('.button-row')) + 1;
+        const teamNumber = localStorage.getItem(`teamNumber${teamIndex}`) || "N/A";
         return {
-            team: `team${teamIndex}`,
+            team: teamNumber,
             rank: button.textContent
         };
     });
