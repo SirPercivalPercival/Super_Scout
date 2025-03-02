@@ -381,21 +381,23 @@
                 }
 
                 // Grey out unselected rows
-                allRows.forEach(row => {
-                    const rowButtons = row.querySelectorAll('button');
-                    const hasActiveButton = Array.from(rowButtons).some(btn => btn.classList.contains('active'));
-                    if (!hasActiveButton) {
-                        rowButtons.forEach(btn => {
-                            btn.disabled = true;
-                            btn.style.backgroundColor = 'grey';
-                        });
-                    } else {
-                        rowButtons.forEach(btn => {
-                            btn.disabled = false;
-                            btn.style.backgroundColor = btn.classList.contains('active') ? 'green' : 'red';
-                        });
-                    }
-                });
+                if (activeButtons.length === 2) {
+                    allRows.forEach(row => {
+                        const rowButtons = row.querySelectorAll('button');
+                        const hasActiveButton = Array.from(rowButtons).some(btn => btn.classList.contains('active'));
+                        if (!hasActiveButton) {
+                            rowButtons.forEach(btn => {
+                                btn.disabled = true;
+                                btn.style.backgroundColor = 'grey';
+                            });
+                        } else {
+                            rowButtons.forEach(btn => {
+                                btn.disabled = false;
+                                btn.style.backgroundColor = btn.classList.contains('active') ? 'green' : 'red';
+                            });
+                        }
+                    });
+                }
             } else {
                 // Original 3x3 grid logic for other sections
                 const row = button.parentElement;
@@ -447,13 +449,11 @@
             
             // Reset all buttons first
             buttons.forEach(btn => {
-                if (!btn.classList.contains('active')) {
-                    btn.style.backgroundColor = "red";
-                    btn.disabled = false;
-                }
+                btn.style.backgroundColor = "red";
+                btn.disabled = false;
             });
 
-            // If two buttons selected
+            // Only grey out unselected rows if two buttons are selected
             if (activeButtons.length === 2) {
                 // Get selected rows
                 const selectedRows = [...new Set(activeButtons.map(btn => 
