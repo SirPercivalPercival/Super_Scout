@@ -205,6 +205,7 @@
 
     <div class="button-container">
         <a id="redirect-button" href="https://sirpercivalpercival.github.io/Super_Scout/" class="pit-scout-button">Go to Main Page</a>
+        <a id="qrcode-button" href="QRCODE.html" class="pit-scout-button">Go to QRCODE</a>
     </div>
 
         <div class="sections-container">
@@ -547,6 +548,10 @@
 
         function saveSelections() {
             localStorage.setItem("usedRanks", JSON.stringify(usedRanks));
+            localStorage.setItem("scoringData", JSON.stringify({
+                successful: document.getElementById("successfully-scored").value,
+                total: document.getElementById("total-attempts").value,
+            }));
         }
 
         function restoreSelections() {
@@ -630,6 +635,38 @@
 
             localStorage.setItem("scoringData", JSON.stringify(data));
         }
+
+        // Add this function to handle redirection to QRCODE
+        document.getElementById("redirect-button").addEventListener("click", function() {
+            const dataToStore = {
+                driverAwareness: {
+                    team1: usedRanks['driver-awareness'][1] || "N/A",
+                    team2: usedRanks['driver-awareness'][2] || "N/A",
+                    team3: usedRanks['driver-awareness'][3] || "N/A",
+                },
+                mobility: {
+                    team1: usedRanks['mobility'][1] || "N/A",
+                    team2: usedRanks['mobility'][2] || "N/A",
+                    team3: usedRanks['mobility'][3] || "N/A",
+                },
+                defense: {
+                    team1: usedRanks['defense'][1] || "N/A",
+                    team2: usedRanks['defense'][2] || "N/A",
+                    team3: usedRanks['defense'][3] || "N/A",
+                },
+                humanPlayerAwareness: {
+                    team1: usedRanks['human-player-awareness'][1] || "N/A",
+                    team2: usedRanks['human-player-awareness'][2] || "N/A",
+                },
+                algaeNetScoring: {
+                    teamNumber: localStorage.getItem("teamNumber1") || "N/A",
+                    successfullyScored: document.getElementById("successfully-scored").value,
+                    totalAttempts: document.getElementById("total-attempts").value,
+                },
+                matchNumber: document.getElementById('match-number').value || "N/A" // Assuming match number is stored in pit_scout
+            };
+            localStorage.setItem("pitScoutData", JSON.stringify(dataToStore));
+        });
 
         initialize();
     });
