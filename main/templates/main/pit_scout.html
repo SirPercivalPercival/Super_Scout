@@ -324,106 +324,120 @@
         </div>
 
     <script>
-document.getElementById("qrcode-button").addEventListener("click", function(event) {
-    event.preventDefault();
-    
-    // Get match number
-    const matchNumber = document.getElementById("match-number").value || "N/A";
+document.addEventListener("DOMContentLoaded", function () {
+    // Ensure the QR code button exists
+    const qrcodeButton = document.getElementById("qrcode-button");
+    if (!qrcodeButton) {
+        console.error("QR Code button not found!");
+        return;
+    }
 
-    // Collect all data
-    const dataToStore = {
-        driverAwareness: getSectionData('driver-awareness'),
-        mobility: getSectionData('mobility'),
-        defense: getSectionData('defense'),
-        humanPlayerAwareness: getHumanPlayerData(),
-        algaeNetScoring: {
-            teamNumber: document.getElementById("algae-net-score").textContent
-                         .replace("Team Number Chosen: ", "") || "N/A",
-            successfullyScored: document.getElementById("successfully-scored").value,
-            totalAttempts: document.getElementById("total-attempts").value,
-            successRate: document.getElementById("success-rate").value
-        },
-        teamNumbers: {
-            team1: localStorage.getItem("teamNumber1"),
-            team2: localStorage.getItem("teamNumber2"),
-            team3: localStorage.getItem("teamNumber3")
-        },
-        matchNumber: matchNumber,
-        timestamp: new Date().toISOString()
-    };
+    // Add event listener to the QR code button
+    qrcodeButton.addEventListener("click", function(event) {
+        event.preventDefault();
 
-    // Compress data using MessagePack
-    const compressedData = msgpack.encode(dataToStore);
+        // Get match number
+        const matchNumberInput = document.getElementById("match-number");
+        if (!matchNumberInput) {
+            alert("Match number input not found!");
+            return;
+        }
+        const matchNumber = matchNumberInput.value || "N/A";
 
-    // Save to QR code history
-    const qrCodeHistory = JSON.parse(localStorage.getItem("qrCodeHistory") || [];
-    qrCodeHistory.push({
-        matchNumber: matchNumber,
-        data: Array.from(compressedData), // Store as array for JSON compatibility
-        timestamp: new Date().toISOString()
-    });
-    localStorage.setItem("qrCodeHistory", JSON.stringify(qrCodeHistory));
-
-    // Generate QR code
-    const qrContainer = document.createElement("div");
-    new QRCode(qrContainer, {
-        text: JSON.stringify(dataToStore), // Display uncompressed data for readability
-        width: 256,
-        height: 256,
-        colorDark: "#000000",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H
-    });
-
-    // Show QR code in a new window
-    const qrWindow = window.open("", "_blank");
-    qrWindow.document.write(`
-        <html>
-            <head>
-                <title>Scouting Data QR Code</title>
-                <style>
-                    body { display: flex; flex-direction: column; align-items: center; }
-                    pre { max-width: 90%; overflow-wrap: break-word; }
-                </style>
-            </head>
-            <body>
-                <h2>Scouting Data (Match ${matchNumber})</h2>
-                <div id="qrcode"></div>
-                <h3>Raw Data:</h3>
-                <pre>${JSON.stringify(dataToStore, null, 2)}</pre>
-            </body>
-        </html>
-    `);
-    qrWindow.document.body.appendChild(qrContainer);
-});
-
-// Helper function to get section data
-function getSectionData(sectionId) {
-    const section = document.getElementById(sectionId);
-    const data = {};
-    section.querySelectorAll('.button-row').forEach((row, index) => {
-        const teamNumber = localStorage.getItem(`teamNumber${index + 1}`) || "N/A";
-        const activeButton = row.querySelector('button.active');
-        data[`team ${teamNumber}`] = activeButton ? activeButton.textContent : "N/A";
-    });
-    return data;
-}
-
-// Modified helper function for human player awareness data
-function getHumanPlayerData() {
-    const section = document.getElementById('human-player-awareness');
-    const activeButtons = Array.from(section.querySelectorAll('button.active'));
-    return activeButtons.map(button => {
-        const teamIndex = Array.from(button.closest('.button-row').parentElement.children)
-                           .indexOf(button.closest('.button-row')) + 1;
-        const teamNumber = localStorage.getItem(`teamNumber${teamIndex}`) || "N/A";
-        return {
-            team: teamNumber,
-            rank: button.textContent
+        // Collect all data
+        const dataToStore = {
+            driverAwareness: getSectionData('driver-awareness'),
+            mobility: getSectionData('mobility'),
+            defense: getSectionData('defense'),
+            humanPlayerAwareness: getHumanPlayerData(),
+            algaeNetScoring: {
+                teamNumber: document.getElementById("algae-net-score").textContent
+                             .replace("Team Number Chosen: ", "") || "N/A",
+                successfullyScored: document.getElementById("successfully-scored").value,
+                totalAttempts: document.getElementById("total-attempts").value,
+                successRate: document.getElementById("success-rate").value
+            },
+            teamNumbers: {
+                team1: localStorage.getItem("teamNumber1"),
+                team2: localStorage.getItem("teamNumber2"),
+                team3: localStorage.getItem("teamNumber3")
+            },
+            matchNumber: matchNumber,
+            timestamp: new Date().toISOString()
         };
-    });
-}
 
+        // Compress data using MessagePack
+        const compressedData = msgpack.encode(dataToStore);
+
+        // Save to QR code history
+        const qrCodeHistory = JSON.parse(localStorage.getItem("qrCodeHistory") || []);
+        qrCodeHistory.push({
+            matchNumber: matchNumber,
+            data: Array.from(compressedData), // Store as array for JSON compatibility
+            timestamp: new Date().toISOString()
+        });
+        localStorage.setItem("qrCodeHistory", JSON.stringify(qrCodeHistory));
+
+        // Generate QR code
+        const qrContainer = document.createElement("div");
+        new QRCode(qrContainer, {
+            text: JSON.stringify(dataToStore), // Display uncompressed data for readability
+            width: 256,
+            height: 256,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+
+        // Show QR code in a new window
+        const qrWindow = window.open("", "_blank");
+        qrWindow.document.write(`
+            <html>
+                <head>
+                    <title>Scouting Data QR Code</title>
+                    <style>
+                        body { display: flex; flex-direction: column; align-items: center; }
+                        pre { max-width: 90%; overflow-wrap: break-word; }
+                    </style>
+                </head>
+                <body>
+                    <h2>Scouting Data (Match ${matchNumber})</h2>
+                    <div id="qrcode"></div>
+                    <h3>Raw Data:</h3>
+                    <pre>${JSON.stringify(dataToStore, null, 2)}</pre>
+                </body>
+            </html>
+        `);
+        qrWindow.document.body.appendChild(qrContainer);
+    });
+
+    // Helper function to get section data
+    function getSectionData(sectionId) {
+        const section = document.getElementById(sectionId);
+        const data = {};
+        section.querySelectorAll('.button-row').forEach((row, index) => {
+            const teamNumber = localStorage.getItem(`teamNumber${index + 1}`) || "N/A";
+            const activeButton = row.querySelector('button.active');
+            data[`team ${teamNumber}`] = activeButton ? activeButton.textContent : "N/A";
+        });
+        return data;
+    }
+
+    // Helper function for human player awareness data
+    function getHumanPlayerData() {
+        const section = document.getElementById('human-player-awareness');
+        const activeButtons = Array.from(section.querySelectorAll('button.active'));
+        return activeButtons.map(button => {
+            const teamIndex = Array.from(button.closest('.button-row').parentElement.children)
+                               .indexOf(button.closest('.button-row')) + 1;
+            const teamNumber = localStorage.getItem(`teamNumber${teamIndex}`) || "N/A";
+            return {
+                team: teamNumber,
+                rank: button.textContent
+            };
+        });
+    }
+});
     </script>
 
 
