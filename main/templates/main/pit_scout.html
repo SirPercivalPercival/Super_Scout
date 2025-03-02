@@ -368,7 +368,7 @@
                 if (activeButtons.length === 2 && selectedRows[0] === selectedRows[1]) {
                     button.classList.remove('active');
                     button.style.backgroundColor = 'red';
-                    alert('Selections must be from different teams.');
+                    
                     return;
                 }
 
@@ -380,15 +380,20 @@
                     return;
                 }
 
-                // Grey out unselected buttons in the same row
-                allButtons.forEach(btn => {
-                    const btnRow = btn.closest('.button-row');
-                    if (btnRow === row && !btn.classList.contains('active')) {
-                        btn.disabled = true;
-                        btn.style.backgroundColor = 'grey';
+                // Grey out unselected rows
+                allRows.forEach(row => {
+                    const rowButtons = row.querySelectorAll('button');
+                    const hasActiveButton = Array.from(rowButtons).some(btn => btn.classList.contains('active'));
+                    if (!hasActiveButton) {
+                        rowButtons.forEach(btn => {
+                            btn.disabled = true;
+                            btn.style.backgroundColor = 'grey';
+                        });
                     } else {
-                        btn.disabled = false;
-                        btn.style.backgroundColor = btn.classList.contains('active') ? 'green' : 'red';
+                        rowButtons.forEach(btn => {
+                            btn.disabled = false;
+                            btn.style.backgroundColor = btn.classList.contains('active') ? 'green' : 'red';
+                        });
                     }
                 });
             } else {
@@ -631,5 +636,3 @@
 </script>
 </body>
 </html>
-
-
