@@ -1,5 +1,3 @@
-{% load static %}
-{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -24,32 +22,42 @@
         form.addEventListener('submit', event => {
             event.preventDefault();
 
-            // Get the values from the input fields
-            const scouterName = document.getElementById('scouter-name').value;
-            const teamNumber = document.getElementById('team-number').value;
-            const matchNumber = document.getElementById('match-number').value;
-            const eventField = document.getElementById('event').value;
-            const offense = document.getElementById('offense').value;
-            const defense = document.getElementById('defense').value;
-            const cooperativeDegree = document.getElementById('cooperative-degree').value;
+            // Retrieve data from local storage
+            const pitScoutData = JSON.parse(localStorage.getItem("pitScoutData"));
 
-            // Update the pitScoutData object with the new values
-            const pitScoutData = {
-                scouterName: scouterName,
-                teamNumber: teamNumber,
-                matchNumber: matchNumber,
-                eventField: eventField,
-                offense: offense,
-                defense: defense,
-                cooperativeDegree: cooperativeDegree,
-                // Add more properties for other sliders
-            };
+            // Format the data as specified
+            const formattedData = `
+Driver awareness
+"Team 1": "${pitScoutData.driverAwareness.team1}",
+"Team 2": "${pitScoutData.driverAwareness.team2}",
+"Team 3": "${pitScoutData.driverAwareness.team3}"
 
-            // Generate the QR code with the updated data
-            const data = JSON.stringify(pitScoutData);
+Mobility
+"Team 1": "${pitScoutData.mobility.team1}",
+"Team 2": "${pitScoutData.mobility.team2}",
+"Team 3": "${pitScoutData.mobility.team3}"
+
+Defense
+"Team 1": "${pitScoutData.defense.team1}",
+"Team 2": "${pitScoutData.defense.team2}",
+"Team 3": "${pitScoutData.defense.team3}"
+
+Human player awareness
+"Team 1": "${pitScoutData.humanPlayerAwareness.team1}",
+"Team 2": "${pitScoutData.humanPlayerAwareness.team2}"
+
+Algae net scoring
+Team number: ${pitScoutData.algaeNetScoring.teamNumber}
+Successfully scored: ${pitScoutData.algaeNetScoring.successfullyScored}
+Total attempts: ${pitScoutData.algaeNetScoring.totalAttempts}
+
+Match number: ${pitScoutData.matchNumber}
+            `;
+
+            // Generate the QR code with the formatted data
             const qr = new QRious({
                 element: document.getElementById('qr-code'),
-                value: data,
+                value: formattedData,
                 size: 256
             });
         });
