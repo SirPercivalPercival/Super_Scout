@@ -281,21 +281,21 @@
             <div class="section" id="human-player-awareness">
                 <h2>HUMAN PLAYER AWARENESS</h2>
                 <div class="button-group">
-                    <div class="button-row">
+                    <div class="button-row" id="team-row-1">
                         <span>Team 1: <span id="team-number-1-display"></span></span>
                         <button onclick="selectButton(this, 'human-player-awareness', 1)">1</button>
-                        <button onclick="selectButton(this, 'human-player-awareness', 2)">2</button>
+                        <button onclick="selectButton(this, 'human-player-awareness', 1)">2</button>
                     </div>
-                    <div class="button-row">
-                        <span>Team 2: <span id="team-number-2-display"></span></span>
-                        <button onclick="selectButton(this, 'human-player-awareness', 1)">1</button>
-                        <button onclick="selectButton(this, 'human-player-awareness', 2)">2</button>
-                    </div>
-                    <div class="button-row">
-                        <span>Team 3: <span id="team-number-3-display"></span></span>
-                        <button onclick="selectButton(this, 'human-player-awareness', 1)">1</button>
-                        <button onclick="selectButton(this, 'human-player-awareness', 2)">2</button>
-                    </div>
+                <div class="button-row" id="team-row-2">
+                    <span>Team 2: <span id="team-number-2-display"></span></span>
+                    <button onclick="selectButton(this, 'human-player-awareness', 2)">1</button>
+                    <button onclick="selectButton(this, 'human-player-awareness', 2)">2</button>
+                </div>
+                <div class="button-row" id="team-row-3">
+                    <span>Team 3: <span id="team-number-3-display"></span></span>
+                    <button onclick="selectButton(this, 'human-player-awareness', 3)">1</button>
+                    <button onclick="selectButton(this, 'human-player-awareness', 3)">2</button>
+                </div>
                 </div>
                 <button id="restart-button" style="margin-top: 10px;">Restart Selections</button>
             </div>
@@ -343,86 +343,80 @@
             const section = document.getElementById(category);
             
             if (category === 'human-player-awareness') {
-                const row = button.parentElement;
-                const allRows = Array.from(section.querySelectorAll('.button-row'));
-                const allButtons = section.querySelectorAll('button');
-                
-                // Clear current row
-                row.querySelectorAll('button').forEach(btn => {
-                    btn.classList.remove('active');
-                    btn.style.backgroundColor = 'red';
-                });
+    const buttonValue = parseInt(button.textContent); // 1 or 2
+    const teamIndex = teamIndexParam; // From HTML onclick parameter
+    const allRows = Array.from(section.querySelectorAll('.button-row'));
 
-                // Toggle current button
-                const wasActive = button.classList.contains('active');
-                button.classList.toggle('active');
-                button.style.backgroundColor = button.classList.contains('active') ? 'green' : 'red';
+    // Track selected values and their teams
+    const currentSelections = {
+        1: { team: null, element: null },
+        2: { team: null, element: null }
+    };
 
-                // Get selected numbers and rows
-                const activeButtons = Array.from(section.querySelectorAll('.active'));
-                const selectedNumbers = new Set(activeButtons.map(b => b.textContent));
-                const selectedRows = new Set(activeButtons.map(b => b.parentElement));
+    // Find existing selections
+    section.querySelectorAll('.active').forEach(activeBtn => {
+        const val = parseInt(activeBtn.textContent);
+        currentSelections[val].team = parseInt(activeBtn.closest('.button-row').id.split('-').pop());
+        currentSelections[val].element = activeBtn;
+    });
 
-                // Update button states
-                allButtons.forEach(btn => {
-                    const btnRow = btn.parentElement;
-                    const btnNumber = btn.textContent;
-                    
-                    // Disable same numbers in other rows
-                    if (btnRow !== row && selectedNumbers.has(btnNumber)) {
-                        btn.disabled = true;
-                        btn.style.backgroundColor = 'grey';
-                    }
-                    // Enable available numbers
-                    else if (!btn.classList.contains('active')) {
-                        btn.disabled = false;
-                        btn.style.backgroundColor = 'red';
-                    }
-                });
+    // Toggle selection
+    if (button.classList.contains('active')) {
+        // Deselect if clicked again
+        button.classList.remove('active');
+        button.style.backgroundColor = 'red';
+    } else {
+        // Only allow one "1" and one "2" from different teams
+        if (buttonValue === 1 && currentSelections[1].team !== null) {
+            currentSelections[1].element.classList.remove('active');
+            currentSelections[1].element.style.backgroundColor = 'red';
+        }
+        if (buttonValue === 2 && currentSelections[2].team !== null) {
+            currentSelections[2].element.classList.remove('active');
+            currentSelections[2].element.style.backgroundColor = 'red';
+        }
 
-                // Grey out ONLY the unselected row when 2 selected
-                if (selectedRows.size === 2) {
-                    const unselectedRow = allRows.find(r => !selectedRows.has(r));
-                    unselectedRow.querySelectorAll('button').forEach(btn => {
-                        btn.disabled = true;
-                        btn.style.backgroundColor = 'grey';
-                    });
-                }
-                // Reset if less than 2 selected
-                else {
-                    allRows.forEach(r => {
-                        if (!selectedRows.has(r)) {
-                            r.querySelectorAll('button').forEach(btn => {
-                                if (!btn.disabled) {
-                                    btn.style.backgroundColor = 'red';
-                                }
-                            });
-                        }
-                    });
-                }
-            } else {
-                // Original 3x3 grid logic for other sections
-                const row = button.parentElement;
-                const colIndex = Array.from(row.children).indexOf(button) - 1;
+        button.classList.add('active');
+        button.style.backgroundColor = 'green';
+    }
 
-                row.querySelectorAll('button').forEach(btn => {
-                    btn.classList.remove("active");
-                    btn.style.backgroundColor = "red";
-                });
+    // Update current selections after toggle
+    const newSelections = {
+        1: { team: null, element: null },
+        2: { team: null, element: null }
+    };
+    section.querySelectorAll('.active').forEach(activeBtn => {
+        const val = parseInt(activeBtn.textContent);
+        newSelections[val].team = parseInt(activeBtn.closest('.button-row').id.split('-').pop());
+        newSelections[val].element = activeBtn;
+    });
 
-                section.querySelectorAll(`.button-row button:nth-child(${colIndex + 2})`).forEach(btn => {
-                    btn.classList.remove("active");
-                    btn.style.backgroundColor = "red";
-                });
+    // Determine which row to disable
+    const selectedTeams = [newSelections[1].team, newSelections[2].team].filter(t => t !== null);
+    let disabledTeam = null;
+    
+    if (selectedTeams.length === 2) {
+        disabledTeam = [1, 2, 3].find(t => !selectedTeams.includes(t));
+    }
 
-                button.classList.add("active");
-                button.style.backgroundColor = "green";
-                selectedTeams[category] = localStorage.getItem(`teamNumber${teamIndex}`) || "N/A";
+    // Update row states
+    allRows.forEach(row => {
+        const rowTeam = parseInt(row.id.split('-').pop());
+        const isDisabled = disabledTeam === rowTeam;
+        
+        row.querySelectorAll('button').forEach(btn => {
+            btn.disabled = isDisabled;
+            if (isDisabled) {
+                btn.style.backgroundColor = 'grey';
+            } else if (!btn.classList.contains('active')) {
+                btn.style.backgroundColor = 'red';
             }
+        });
+    });
 
-            updateAlgaeNetScoring();
-            saveSelections();
-        };
+    updateAlgaeNetScoring();
+    saveSelections();
+}
 
         function initialize() {
             restoreSelections();
@@ -481,23 +475,19 @@
         // Update algae net scoring when changes occur
         function updateAlgaeNetScoring() {
     const section = document.getElementById('human-player-awareness');
-    const algaeNetScoreText = document.getElementById("algae-net-score") || document.createElement("p");
-    
-    if (!algaeNetScoreText.id) {
-        algaeNetScoreText.id = "algae-net-score";
-        document.getElementById("scoring").appendChild(algaeNetScoreText);
-    }
-
     const allRows = Array.from(section.querySelectorAll('.button-row'));
-    const activeRows = allRows.filter(row => row.querySelector('.active'));
-
-    if (activeRows.length === 2) {
-        const inactiveRow = allRows.find(row => !activeRows.includes(row));
-        const rowIndex = allRows.indexOf(inactiveRow);
-        const teamNumber = localStorage.getItem(`teamNumber${rowIndex + 1}`) || "N/A";
-        algaeNetScoreText.textContent = `Team Number Chosen: ${teamNumber}`;
+    const disabledRow = allRows.find(row => row.querySelector('button:disabled'));
+    
+    function updateAlgaeNetScoring() {
+    const section = document.getElementById('human-player-awareness');
+    const allRows = Array.from(section.querySelectorAll('.button-row'));
+    const disabledRow = allRows.find(row => row.querySelector('button:disabled'));
+    
+    if (disabledRow) {
+        const teamNumber = disabledRow.querySelector('span').textContent.split(': ')[1];
+        document.getElementById('success-rate').value = `Disabled Team: ${teamNumber}`;
     } else {
-        algaeNetScoreText.textContent = "Team Number Chosen: N/A";
+        document.getElementById('success-rate').value = 'No team disabled';
     }
 }
 
