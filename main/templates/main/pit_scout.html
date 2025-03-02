@@ -348,73 +348,70 @@
 
     // Toggle the clicked button's state
     const wasActive = button.classList.contains('active');
-button.classList.toggle('active');
-button.style.backgroundColor = button.classList.contains('active') ? 'green' : 'red';
-
-const activeButtons = Array.from(section.querySelectorAll('.active'));
-const selectedNumbers = activeButtons.map(btn => btn.textContent);
-const selectedRows = activeButtons.map(btn => btn.closest('.button-row'));
-
-// Check for duplicate numbers
-const hasDuplicates = new Set(selectedNumbers).size !== selectedNumbers.length;
-if (hasDuplicates) {
     button.classList.toggle('active');
-    button.style.backgroundColor = 'red';
-    alert('Select one "1" and one "2" from different teams.');
-    return;
-}
+    button.style.backgroundColor = button.classList.contains('active') ? 'green' : 'red';
 
-// Check if both selections are from the same team
-if (activeButtons.length === 2 && selectedRows[0] === selectedRows[1]) {
-    button.classList.remove('active');
-    button.style.backgroundColor = 'red';
-    alert('Selections must be from different teams.');
-    return;
-}
+    // Get active buttons and their details
+    const activeButtons = Array.from(section.querySelectorAll('.active'));
+    const selectedNumbers = activeButtons.map(btn => btn.textContent);
+    const selectedRows = activeButtons.map(btn => btn.parentElement);
 
-// Enforce max two selections
-if (activeButtons.length > 2) {
-    button.classList.toggle('active');
-    button.style.backgroundColor = 'red';
-    alert('Max two selections.');
-    return;
-}
+    // Check for duplicate numbers
+    const hasDuplicates = new Set(selectedNumbers).size !== selectedNumbers.length;
+    if (hasDuplicates) {
+        button.classList.toggle('active');
+        button.style.backgroundColor = 'red';
+        alert('You must select one "1" and one "2" from different teams.');
+        return;
+    }
 
-// Disable conflicting buttons
-const allButtons = section.querySelectorAll('button');
-const allRows = Array.from(section.querySelectorAll('.button-row'));
+    // Enforce maximum of two selections
+    if (activeButtons.length > 2) {
+        button.classList.toggle('active');
+        button.style.backgroundColor = 'red';
+        alert('Maximum two selections allowed.');
+        return;
+    }
 
-allButtons.forEach(btn => {
-    if (btn === button) return;
-    const btnNumber = btn.textContent;
-    const btnRow = btn.closest('.button-row');
-    const conflict = activeButtons.some(activeBtn => 
-        activeBtn.textContent === btnNumber && 
-        activeBtn.closest('.button-row') !== btnRow
-    );
-    btn.disabled = conflict;
-    btn.style.backgroundColor = conflict ? 'grey' : btn.classList.contains('active') ? 'green' : 'red';
-});
+    // Disable conflicting buttons and handle third row
+    allButtons.forEach(btn => {
+        const btnNumber = btn.textContent;
+        const btnRow = btn.parentElement;
 
-// Handle third row
-if (activeButtons.length === 2) {
-    const thirdRow = allRows.find(row => !selectedRows.includes(row));
-    thirdRow?.querySelectorAll('button').forEach(btn => {
-        btn.disabled = true;
-        btn.style.backgroundColor = 'grey';
+        if (btn === button) return; // Skip the clicked button
+
+        // Disable if same number is active in another row
+        const conflict = activeButtons.some(activeBtn =>
+            activeBtn.textContent === btnNumber &&
+            activeBtn.parentElement !== btnRow
+        );
+        btn.disabled = conflict;
+        btn.style.backgroundColor = conflict ? 'grey' : (btn.classList.contains('active') ? 'green' : 'red');
     });
-} else {
-    allRows.forEach(row => {
-        if (!selectedRows.includes(row)) {
-            row.querySelectorAll('button').forEach(btn => {
-                btn.disabled = false;
-                btn.style.backgroundColor = btn.classList.contains('active') ? 'green' : 'red';
+
+    // Disable third row if two selections are made
+    if (activeButtons.length === 2) {
+        const thirdRow = allRows.find(r => !selectedRows.includes(r));
+        if (thirdRow) {
+            thirdRow.querySelectorAll('button').forEach(btn => {
+                btn.disabled = true;
+                btn.style.backgroundColor = 'grey';
             });
         }
-    });
-}
+    } else {
+        // Enable all rows when less than two selections
+        allRows.forEach(r => {
+            if (!selectedRows.includes(r)) {
+                r.querySelectorAll('button').forEach(btn => {
+                    if (!btn.disabled) btn.style.backgroundColor = 'red';
+                });
+            }
+        });
+    }
 
-    
+    updateAlgaeNetScoring();
+    saveSelections();
+}
             } else {
                 // Original 3x3 grid logic for other sections
                 const row = button.parentElement;
@@ -655,7 +652,6 @@ if (activeButtons.length === 2) {
 </script>
 </body>
 </html>
-
 
 
 
