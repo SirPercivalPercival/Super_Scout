@@ -342,63 +342,76 @@
             const section = document.getElementById(category);
             
             if (category === 'human-player-awareness') {
-                const row = button.parentElement;
-                const allRows = Array.from(section.querySelectorAll('.button-row'));
-                const allButtons = section.querySelectorAll('button');
-                
-                // Clear current row
-                row.querySelectorAll('button').forEach(btn => {
-                    btn.classList.remove('active');
-                    btn.style.backgroundColor = 'red';
+    const row = button.parentElement;
+    const allRows = Array.from(section.querySelectorAll('.button-row'));
+    const allButtons = section.querySelectorAll('button');
+
+    // Toggle the clicked button's state
+    const wasActive = button.classList.contains('active');
+    button.classList.toggle('active');
+    button.style.backgroundColor = button.classList.contains('active') ? 'green' : 'red';
+
+    // Get active buttons and their details
+    const activeButtons = Array.from(section.querySelectorAll('.active'));
+    const selectedNumbers = activeButtons.map(btn => btn.textContent);
+    const selectedRows = activeButtons.map(btn => btn.parentElement);
+
+    // Check for duplicate numbers
+    const hasDuplicates = new Set(selectedNumbers).size !== selectedNumbers.length;
+    if (hasDuplicates) {
+        button.classList.toggle('active');
+        button.style.backgroundColor = 'red';
+        alert('You must select one "1" and one "2" from different teams.');
+        return;
+    }
+
+    // Enforce maximum of two selections
+    if (activeButtons.length > 2) {
+        button.classList.toggle('active');
+        button.style.backgroundColor = 'red';
+        alert('Maximum two selections allowed.');
+        return;
+    }
+
+    // Disable conflicting buttons and handle third row
+    allButtons.forEach(btn => {
+        const btnNumber = btn.textContent;
+        const btnRow = btn.parentElement;
+
+        if (btn === button) return; // Skip the clicked button
+
+        // Disable if same number is active in another row
+        const conflict = activeButtons.some(activeBtn =>
+            activeBtn.textContent === btnNumber &&
+            activeBtn.parentElement !== btnRow
+        );
+        btn.disabled = conflict;
+        btn.style.backgroundColor = conflict ? 'grey' : (btn.classList.contains('active') ? 'green' : 'red');
+    });
+
+    // Disable third row if two selections are made
+    if (activeButtons.length === 2) {
+        const thirdRow = allRows.find(r => !selectedRows.includes(r));
+        if (thirdRow) {
+            thirdRow.querySelectorAll('button').forEach(btn => {
+                btn.disabled = true;
+                btn.style.backgroundColor = 'grey';
+            });
+        }
+    } else {
+        // Enable all rows when less than two selections
+        allRows.forEach(r => {
+            if (!selectedRows.includes(r)) {
+                r.querySelectorAll('button').forEach(btn => {
+                    if (!btn.disabled) btn.style.backgroundColor = 'red';
                 });
+            }
+        });
+    }
 
-                // Toggle current button
-                const wasActive = button.classList.contains('active');
-                button.classList.toggle('active');
-                button.style.backgroundColor = button.classList.contains('active') ? 'green' : 'red';
-
-                // Get selected numbers and rows
-                const activeButtons = Array.from(section.querySelectorAll('.active'));
-                const selectedNumbers = new Set(activeButtons.map(b => b.textContent));
-                const selectedRows = new Set(activeButtons.map(b => b.parentElement));
-
-                // Update button states
-                allButtons.forEach(btn => {
-                    const btnRow = btn.parentElement;
-                    const btnNumber = btn.textContent;
-                    
-                    // Disable same numbers in other rows
-                    if (btnRow !== row && selectedNumbers.has(btnNumber)) {
-                        btn.disabled = true;
-                        btn.style.backgroundColor = 'grey';
-                    }
-                    // Enable available numbers
-                    else if (!btn.classList.contains('active')) {
-                        btn.disabled = false;
-                        btn.style.backgroundColor = 'red';
-                    }
-                });
-
-                // Grey out ONLY the unselected row when 2 selected
-                if (selectedRows.size === 2) {
-                    const unselectedRow = allRows.find(r => !selectedRows.has(r));
-                    unselectedRow.querySelectorAll('button').forEach(btn => {
-                        btn.disabled = true;
-                        btn.style.backgroundColor = 'grey';
-                    });
-                }
-                // Reset if less than 2 selected
-                else {
-                    allRows.forEach(r => {
-                        if (!selectedRows.has(r)) {
-                            r.querySelectorAll('button').forEach(btn => {
-                                if (!btn.disabled) {
-                                    btn.style.backgroundColor = 'red';
-                                }
-                            });
-                        }
-                    });
-                }
+    updateAlgaeNetScoring();
+    saveSelections();
+}
             } else {
                 // Original 3x3 grid logic for other sections
                 const row = button.parentElement;
