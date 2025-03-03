@@ -324,23 +324,11 @@
         </div>
 
     <script>
-document.addEventListener("DOMContentLoaded", function () {
-    console.log("DOM fully loaded!");
+document.getElementById("qrcode-button").addEventListener("click", function(event) {
+    event.preventDefault();
 
-    // Ensure the QR code button exists
-    const qrcodeButton = document.getElementById("qrcode-button");
-    if (!qrcodeButton) {
-        console.error("QR Code button not found!");
-        return;
-    }
-
-    // Add event listener to the QR code button
-    qrcodeButton.addEventListener("click", function(event) {
-        event.preventDefault();
-
-        // Get match number from localStorage
-        const matchNumber = localStorage.getItem("matchNumber") || "N/A";
-        console.log("Match number retrieved from localStorage:", matchNumber);
+    // Get match number from localStorage
+    const matchNumber = localStorage.getItem("matchNumber") || "N/A";
 
         // Collect all data
         const dataToStore = {
@@ -368,76 +356,19 @@ document.addEventListener("DOMContentLoaded", function () {
         const compressedData = msgpack.encode(dataToStore);
 
         // Save to QR code history
-        const qrCodeHistory = JSON.parse(localStorage.getItem("qrCodeHistory") || []);
-qrCodeHistory.push({
-    matchNumber: matchNumber,
-    data: dataToStore, // Store uncompressed data for debugging
-    timestamp: new Date().toISOString()
-});
-localStorage.setItem("qrCodeHistory", JSON.stringify(qrCodeHistory));
-
-// Log the saved data for debugging
-console.log("QR Code History Saved:", qrCodeHistory);
-
-        // Generate QR code
-        const qrContainer = document.createElement("div");
-        new QRCode(qrContainer, {
-            text: JSON.stringify(dataToStore), // Display uncompressed data for readability
-            width: 256,
-            height: 256,
-            colorDark: "#000000",
-            colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.H
-        });
-
-        // Show QR code in a new window
-        const qrWindow = window.open("", "_blank");
-        qrWindow.document.write(`
-            <html>
-                <head>
-                    <title>Scouting Data QR Code</title>
-                    <style>
-                        body { display: flex; flex-direction: column; align-items: center; }
-                        pre { max-width: 90%; overflow-wrap: break-word; }
-                    </style>
-                </head>
-                <body>
-                    <h2>Scouting Data (Match ${matchNumber})</h2>
-                    <div id="qrcode"></div>
-                    <h3>Raw Data:</h3>
-                    <pre>${JSON.stringify(dataToStore, null, 2)}</pre>
-                </body>
-            </html>
-        `);
-        qrWindow.document.body.appendChild(qrContainer);
+        const qrCodeHistory = JSON.parse(localStorage.getItem("qrCodeHistory") || "[]");
+    qrCodeHistory.push({
+        matchNumber: matchNumber,
+        data: dataToStore,
+        timestamp: new Date().toISOString()
     });
+    localStorage.setItem("qrCodeHistory", JSON.stringify(qrCodeHistory));
 
-    // Helper function to get section data
-    function getSectionData(sectionId) {
-        const section = document.getElementById(sectionId);
-        const data = {};
-        section.querySelectorAll('.button-row').forEach((row, index) => {
-            const teamNumber = localStorage.getItem(`teamNumber${index + 1}`) || "N/A";
-            const activeButton = row.querySelector('button.active');
-            data[`team ${teamNumber}`] = activeButton ? activeButton.textContent : "N/A";
-        });
-        return data;
-    }
-
-    // Helper function for human player awareness data
-    function getHumanPlayerData() {
-        const section = document.getElementById('human-player-awareness');
-        const activeButtons = Array.from(section.querySelectorAll('button.active'));
-        return activeButtons.map(button => {
-            const teamIndex = Array.from(button.closest('.button-row').parentElement.children)
-                               .indexOf(button.closest('.button-row')) + 1;
-            const teamNumber = localStorage.getItem(`teamNumber${teamIndex}`) || "N/A";
-            return {
-                team: teamNumber,
-                rank: button.textContent
-            };
-        });
-    }
+    // Store current QR data temporarily
+    localStorage.setItem("currentQRData", JSON.stringify(dataToStore));
+    
+    // Redirect to display page
+    window.location.href = "main\templates\main\qr_display.html";
 });
     </script>
 
