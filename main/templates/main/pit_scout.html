@@ -324,6 +324,24 @@
         </div>
 
     <script>
+
+        function getSectionData(sectionId) {
+    const section = document.getElementById(sectionId);
+    const buttons = section.querySelectorAll('.button-group button');
+    const selectedValues = [];
+
+    buttons.forEach(button => {
+        if (button.classList.contains('active')) {
+            selectedValues.push(button.textContent);
+        }
+    });
+
+    return {
+        selected: selectedValues,
+        teamNumber: localStorage.getItem(`teamNumber${sectionId.charAt(sectionId.length - 1)}`) || "N/A"
+    };
+}
+        
 document.getElementById("qrcode-button").addEventListener("click", function(event) {
     event.preventDefault();
 
@@ -363,22 +381,7 @@ document.getElementById("qrcode-button").addEventListener("click", function(even
     localStorage.setItem("qrCodeHistory", JSON.stringify(qrCodeHistory));
 
 // Function to get section data
-function getSectionData(sectionId) {
-    const section = document.getElementById(sectionId);
-    const buttons = section.querySelectorAll('.button-group button');
-    const selectedValues = [];
 
-    buttons.forEach(button => {
-        if (button.classList.contains('active')) {
-            selectedValues.push(button.textContent);
-        }
-    });
-
-    return {
-        selected: selectedValues,
-        teamNumber: localStorage.getItem(`teamNumber${sectionId.charAt(sectionId.length - 1)}`) || "N/A"
-    };
-}
     </script>
 
 
