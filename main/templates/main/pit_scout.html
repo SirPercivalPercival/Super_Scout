@@ -327,30 +327,28 @@
 document.getElementById("qrcode-button").addEventListener("click", function(event) {
     event.preventDefault();
 
-    // Get match number from localStorage
+    // Redirect to the QR code page with data as query parameters
     const matchNumber = localStorage.getItem("matchNumber") || "N/A";
-
-        // Collect all data
-        const dataToStore = {
-            driverAwareness: getSectionData('driver-awareness'),
-            mobility: getSectionData('mobility'),
-            defense: getSectionData('defense'),
-            humanPlayerAwareness: getHumanPlayerData(),
-            algaeNetScoring: {
-                teamNumber: document.getElementById("algae-net-score").textContent
-                             .replace("Team Number Chosen: ", "") || "N/A",
-                successfullyScored: document.getElementById("successfully-scored").value,
-                totalAttempts: document.getElementById("total-attempts").value,
-                successRate: document.getElementById("success-rate").value
-            },
-            teamNumbers: {
-                team1: localStorage.getItem("teamNumber1"),
-                team2: localStorage.getItem("teamNumber2"),
-                team3: localStorage.getItem("teamNumber3")
-            },
-            matchNumber: matchNumber,
-            timestamp: new Date().toISOString()
-        };
+    const dataToStore = {
+        driverAwareness: getSectionData('driver-awareness'),
+        mobility: getSectionData('mobility'),
+        defense: getSectionData('defense'),
+        humanPlayerAwareness: getHumanPlayerData(),
+        algaeNetScoring: {
+            teamNumber: document.getElementById("algae-net-score").textContent
+                         .replace("Team Number Chosen: ", "") || "N/A",
+            successfullyScored: document.getElementById("successfully-scored").value,
+            totalAttempts: document.getElementById("total-attempts").value,
+            successRate: document.getElementById("success-rate").value
+        },
+        teamNumbers: {
+            team1: localStorage.getItem("teamNumber1"),
+            team2: localStorage.getItem("teamNumber2"),
+            team3: localStorage.getItem("teamNumber3")
+        },
+        matchNumber: matchNumber,
+        timestamp: new Date().toISOString()
+    };
 
         // Compress data using MessagePack
         const compressedData = msgpack.encode(dataToStore);
@@ -364,12 +362,23 @@ document.getElementById("qrcode-button").addEventListener("click", function(even
     });
     localStorage.setItem("qrCodeHistory", JSON.stringify(qrCodeHistory));
 
-    // Store current QR data temporarily
-    localStorage.setItem("currentQRData", JSON.stringify(dataToStore));
-    
-    // Redirect to display page
-    window.location.href = "main\templates\main\qr_display.html";
-});
+// Function to get section data
+function getSectionData(sectionId) {
+    const section = document.getElementById(sectionId);
+    const buttons = section.querySelectorAll('.button-group button');
+    const selectedValues = [];
+
+    buttons.forEach(button => {
+        if (button.classList.contains('active')) {
+            selectedValues.push(button.textContent);
+        }
+    });
+
+    return {
+        selected: selectedValues,
+        teamNumber: localStorage.getItem(`teamNumber${sectionId.charAt(sectionId.length - 1)}`) || "N/A"
+    };
+}
     </script>
 
 
