@@ -322,10 +322,9 @@
                 </div>
             </div>
         </div>
-
-    <script>
-
-        function getSectionData(sectionId) {
+<script>
+// Moved functions to top for better organization
+function getSectionData(sectionId) {
     const section = document.getElementById(sectionId);
     const buttons = section.querySelectorAll('.button-group button');
     const selectedValues = [];
@@ -341,11 +340,20 @@
         teamNumber: localStorage.getItem(`teamNumber${sectionId.charAt(sectionId.length - 1)}`) || "N/A"
     };
 }
-        
+
+function getHumanPlayerData() {
+    const section = document.getElementById('human-player-awareness');
+    const activeButtons = section.querySelectorAll('.active');
+    return Array.from(activeButtons).map(button => ({
+        team: button.closest('.button-row').querySelector('span').textContent.replace('Team ', ''),
+        rating: button.textContent
+    }));
+}
+
+// QR Code Handler
 document.getElementById("qrcode-button").addEventListener("click", function(event) {
     event.preventDefault();
 
-    // Redirect to the QR code page with data as query parameters
     const matchNumber = localStorage.getItem("matchNumber") || "N/A";
     const dataToStore = {
         driverAwareness: getSectionData('driver-awareness'),
@@ -368,21 +376,26 @@ document.getElementById("qrcode-button").addEventListener("click", function(even
         timestamp: new Date().toISOString()
     };
 
-        // Compress data using MessagePack
+    // Fix path escaping (important!)
+    window.location.href = "main/templates/main/qr_display.html";  // Use forward slashes
+
+    // Optional: Add error handling
+    try {
         const compressedData = msgpack.encode(dataToStore);
-
-        // Save to QR code history
         const qrCodeHistory = JSON.parse(localStorage.getItem("qrCodeHistory") || "[]");
-    qrCodeHistory.push({
-        matchNumber: matchNumber,
-        data: dataToStore,
-        timestamp: new Date().toISOString()
-    });
-    localStorage.setItem("qrCodeHistory", JSON.stringify(qrCodeHistory));
-
-// Function to get section data
-
-    </script>
+        qrCodeHistory.push({
+            matchNumber: matchNumber,
+            data: dataToStore,
+            timestamp: new Date().toISOString()
+        });
+        localStorage.setItem("qrCodeHistory", JSON.stringify(qrCodeHistory));
+        localStorage.setItem("currentQRData", JSON.stringify(dataToStore));
+    } catch (error) {
+        console.error("QR Code Generation Error:", error);
+        alert("Failed to generate QR code. Please check your data.");
+    }
+});
+</script>
 
 
 
