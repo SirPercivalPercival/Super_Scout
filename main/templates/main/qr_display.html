@@ -1,1 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Display</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        /* Add your existing styles here */
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: rgb(0, 217, 255);
+            font-family: 'Bebas Neue', sans-serif;
+        }
+        .qr-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .pit-scout-button {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="qr-container">
+        <div id="qrcode"></div>
+    </div>
+    <a href="https://sirpercivalpercival.github.io/Super_Scout/" class="pit-scout-button">Return to Main Page</a>
 
+    <script>
+        // Get stored data
+        const data = JSON.parse(localStorage.getItem("currentQRData") || "{}");
+        
+        // Generate QR Code
+        new QRCode(document.getElementById("qrcode"), {
+            text: JSON.stringify(data),
+            width: 256,
+            height: 256,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+    </script>
+</body>
+</html>
