@@ -177,57 +177,67 @@
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Load data when the page is loaded
-            loadFormData();
+    document.addEventListener("DOMContentLoaded", function() {
+        // Load data when the page is loaded
+        loadFormData();
 
-            // Attach event listener to the pit scout button
-            document.getElementById("pit-scout-button").addEventListener("click", function(event) {
-                event.preventDefault(); // Prevent default navigation
-
-                // Collect form data
-                saveFormData();
-
-                // Navigate to the pit scout page
-                window.location.href = this.href;
-            });
+        // Add input event listeners to all form fields
+        const inputs = document.querySelectorAll('.info-input');
+        inputs.forEach(input => {
+            input.addEventListener('input', saveFormData);
+            input.addEventListener('change', saveFormData);
         });
 
-        // Save form data to local storage
-        function saveFormData() {
-            const scouterName = document.getElementById("scouter-name").value;
-            const teamNumber1 = document.getElementById("team-number-1").value;
-            const teamNumber2 = document.getElementById("team-number-2").value;
-            const teamNumber3 = document.getElementById("team-number-3").value;
-            const matchNumber = document.getElementById("match-number").value;
-            const eventField = document.getElementById("event").value;
-            const TotalPoints = document.getElementById("total-points").value;
+        // Attach event listener to the pit scout button
+        document.getElementById("pit-scout-button").addEventListener("click", function(event) {
+            event.preventDefault(); // Prevent default navigation
+            saveFormData(); // Ensure data is saved before navigation
+            window.location.href = this.href;
+        });
 
-            console.log("Saving form data...");
-            console.log("Scouter Name:", scouterName);
-            console.log("Team Number 1:", teamNumber1);
-            console.log("Team Number 2:", teamNumber2);
-            console.log("Team Number 3:", teamNumber3);
+        // Add similar listener for QR History button if needed
+        document.getElementById("qr-history-button").addEventListener("click", function(event) {
+            event.preventDefault();
+            saveFormData();
+            window.location.href = this.href;
+        });
+    });
 
-            localStorage.setItem("scouterName", scouterName);
-            localStorage.setItem("teamNumber1", teamNumber1);
-            localStorage.setItem("teamNumber2", teamNumber2);
-            localStorage.setItem("teamNumber3", teamNumber3);
-            localStorage.setItem("matchNumber", matchNumber);
-            localStorage.setItem("eventField", eventField);
-            localStorage.setItem("TotalPoints", TotalPoints);
-        }
+    // Save form data to local storage
+    function saveFormData() {
+        const scouterName = document.getElementById("scouter-name").value;
+        const teamNumber1 = document.getElementById("team-number-1").value;
+        const teamNumber2 = document.getElementById("team-number-2").value;
+        const teamNumber3 = document.getElementById("team-number-3").value;
+        const matchNumber = document.getElementById("match-number").value;
+        const eventField = document.getElementById("event").value;
 
-        // Load form data from local storage
-        function loadFormData() {
-            document.getElementById("scouter-name").value = localStorage.getItem("scouterName") || '';
-            document.getElementById("team-number-1").value = localStorage.getItem("teamNumber1") || '';
-            document.getElementById("team-number-2").value = localStorage.getItem("teamNumber2") || '';
-            document.getElementById("team-number-3").value = localStorage.getItem("teamNumber3") || '';
-            document.getElementById("match-number").value = localStorage.getItem("matchNumber") || '';
-            document.getElementById("event").value = localStorage.getItem("eventField") || '';
-            document.getElementById("total-points").value = localStorage.getItem("TotalPoints") || '';
-        }
-    </script>
+        localStorage.setItem("scouterName", scouterName);
+        localStorage.setItem("teamNumber1", teamNumber1);
+        localStorage.setItem("teamNumber2", teamNumber2);
+        localStorage.setItem("teamNumber3", teamNumber3);
+        localStorage.setItem("matchNumber", matchNumber);
+        localStorage.setItem("eventField", eventField);
+
+        console.log("SAVED DATA:", { 
+    teamNumber1,
+    teamNumber2,
+    teamNumber3,
+    matchNumber,
+    eventField
+  });
+}
+    }
+
+    // Load form data from local storage
+    function loadFormData() {
+        document.getElementById("scouter-name").value = localStorage.getItem("scouterName") || '';
+        document.getElementById("team-number-1").value = localStorage.getItem("teamNumber1") || '';
+        document.getElementById("team-number-2").value = localStorage.getItem("teamNumber2") || '';
+        document.getElementById("team-number-3").value = localStorage.getItem("teamNumber3") || '';
+        document.getElementById("match-number").value = localStorage.getItem("matchNumber") || '';
+        document.getElementById("event").value = localStorage.getItem("eventField") || '';
+    }
+</script>
 </body>
 </html>
