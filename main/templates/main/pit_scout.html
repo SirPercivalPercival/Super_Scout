@@ -745,6 +745,15 @@ document.getElementById("qrcode-button").addEventListener("click", function(even
 
         initialize();
     });
+
+window.addEventListener('beforeunload', function() {
+        // Reset scoring data in localStorage
+        localStorage.setItem('scoringData', JSON.stringify({ 
+            successful: "0", 
+            total: "0", 
+            successRate: "0%" 
+        }));
+    });
 </script>
 </body>
 </html>
