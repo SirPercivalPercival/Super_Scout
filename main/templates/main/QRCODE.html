@@ -20,48 +20,44 @@
         const form = document.getElementById('pitScoutForm');
 
         // Add an event listener to handle form submission
-        form.addEventListener('submit', event => {
-            event.preventDefault();
+        const compactData = {
+        DriverAwareness: { // Driver Awareness
+            team1: pitScoutData.driverAwareness.team1,
+            team2: pitScoutData.driverAwareness.team2,
+            team3: pitScoutData.driverAwareness.team3
+        },
+        Mobility: { // Mobility
+            team1: pitScoutData.mobility.team1,
+            team2: pitScoutData.mobility.team2,
+            team3: pitScoutData.mobility.team3
+        },
+        Defense: { // Defense
+            team1: pitScoutData.defense.team1,
+            team2: pitScoutData.defense.team2,
+            team3: pitScoutData.defense.team3
+        },
+        HumanPlayerAwareness: { // Human Player Awareness
+            team1: pitScoutData.humanPlayerAwareness.team1,
+            team2: pitScoutData.humanPlayerAwareness.team2
+        },
+        AlgaeNetScoring: { // Algae Net Scoring
+            TeamNumber: pitScoutData.algaeNetScoring.teamNumber,
+            Success: pitScoutData.algaeNetScoring.successfullyScored,
+            Total: pitScoutData.algaeNetScoring.totalAttempts
+        },
+        MatchNumber: pitScoutData.matchNumber // Match Number
+    };
 
-            // Retrieve data from local storage
-            const pitScoutData = JSON.parse(localStorage.getItem("pitScoutData"));
+    // Convert to compact JSON string
+    const formattedData = JSON.stringify(compactData);
 
-            // Format the data as specified
-            const formattedData = `
-Driver awareness
-"Team 1": "${pitScoutData.driverAwareness.team1}",
-"Team 2": "${pitScoutData.driverAwareness.team2}",
-"Team 3": "${pitScoutData.driverAwareness.team3}"
-
-Mobility
-"Team 1": "${pitScoutData.mobility.team1}",
-"Team 2": "${pitScoutData.mobility.team2}",
-"Team 3": "${pitScoutData.mobility.team3}"
-
-Defense
-"Team 1": "${pitScoutData.defense.team1}",
-"Team 2": "${pitScoutData.defense.team2}",
-"Team 3": "${pitScoutData.defense.team3}"
-
-Human player awareness
-"Team 1": "${pitScoutData.humanPlayerAwareness.team1}",
-"Team 2": "${pitScoutData.humanPlayerAwareness.team2}"
-
-Algae net scoring
-Team number: ${pitScoutData.algaeNetScoring.teamNumber}
-Successfully scored: ${pitScoutData.algaeNetScoring.successfullyScored}
-Total attempts: ${pitScoutData.algaeNetScoring.totalAttempts}
-
-Match number: ${pitScoutData.matchNumber}
-            `;
-
-            // Generate the QR code with the formatted data
-            const qr = new QRious({
-                element: document.getElementById('qr-code'),
-                value: formattedData,
-                size: 256
-            });
-        });
+    // Generate QR code
+    const qr = new QRious({
+        element: document.getElementById('qr-code'),
+        value: formattedData,
+        size: 256
+    });
+});
     </script>
 </body>
 </html>
