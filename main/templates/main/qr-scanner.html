@@ -1,1 +1,79 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <video id="video" width="720" height="420"></video>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <script>
+        const video = document.getElementById('video');
+        const API_ROOT_URL = "http://localhost:8000";
+        let lastResult = '';
 
+        async function initCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+                video.srcObject = stream;
+                video.play();
+                requestAnimationFrame(tick);
+            } catch (err) {
+                console.error('Camera access failed:', err);
+            }
+        }
+
+        async function tick() {
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height);
+                
+                if (code && code.data !== lastResult) {
+                    lastResult = code.data;
+                    handleQrCode(code.data);
+                }
+            }
+            requestAnimationFrame(tick);
+        }
+
+        async function handleQrCode(text) {
+            try {
+                const [dataType, encodedData] = text.split('|');
+                const schema = await loadSchema(dataType);
+                const jsonData = decodeQr(encodedData, schema);
+                console.log('Decoded:', jsonData);
+                sendData(dataType, jsonData);
+            } catch (err) {
+                console.error('Decoding failed:', err);
+            }
+        }
+
+        async function loadSchema(dataType) {
+            const response = await fetch(`schema/${dataType}_schema.yaml`);
+            const yamlText = await response.text();
+            return jsYaml.load(yamlText).schema;
+        }
+
+        function sendData(dataType, jsonData) {
+            const endpoint = dataType === 'objective_data' 
+                ? '/objective/raw' 
+                : '/subjective/raw';
+            
+            fetch(API_ROOT_URL + endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(jsonData)
+            }).then(response => {
+                if (!response.ok) throw new Error('Request failed');
+                console.log('Data sent successfully');
+            }).catch(err => {
+                console.error('Error sending data:', err);
+            });
+        }
+
+        initCamera();
+    </script>
+</body>
+</html>
