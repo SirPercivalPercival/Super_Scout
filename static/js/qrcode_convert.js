@@ -1,5 +1,5 @@
-import pako from 'https://cdn.skypack.dev/pako@2.1.0';
-import jsYaml from 'https://cdn.jsdelivr.net/npm/js-yaml@4.2.0/dist/js-yaml.mjs';
+import pako from 'https://cdn.jsdelivr.net/npm/pako@2.1.0/+esm';
+import jsYaml from 'https://cdn.skypack.dev/js-yaml@4.2.0';
 
 export async function loadSchemaFromYaml(yamlUrl) {
     const response = await fetch(yamlUrl);
