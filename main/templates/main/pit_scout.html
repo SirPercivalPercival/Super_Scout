@@ -8,6 +8,9 @@
     <meta name="theme-color" content="#00ffff">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/msgpack-lite/0.1.26/msgpack.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@msgpack/msgpack@2.8.0/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/base45-js@3.0.0/dist/base45.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
 
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="static\styles.css">
@@ -215,19 +218,19 @@
             <div class="section" id="driver-awareness">
                 <h2>DRIVER AWARENESS</h2>
                 <div class="button-group">
-                    <div class="button-row">
+                    <div class="button-row" data-team="1">
                         <span>Team 1: <span id="team-number-1-display"></span></span>
                         <button onclick="selectButton(this, 'driver-awareness', 1)">1</button>
                         <button onclick="selectButton(this, 'driver-awareness', 2)">2</button>
                         <button onclick="selectButton(this, 'driver-awareness', 3)">3</button>
                     </div>
-                    <div class="button-row">
+                    <div class="button-row" data-team="2">
                         <span>Team 2: <span id="team-number-2-display"></span></span>
                         <button onclick="selectButton(this, 'driver-awareness', 1)">1</button>
                         <button onclick="selectButton(this, 'driver-awareness', 2)">2</button>
                         <button onclick="selectButton(this, 'driver-awareness', 3)">3</button>
                     </div>
-                    <div class="button-row">
+                    <div class="button-row" data-team="3">
                         <span>Team 3: <span id="team-number-3-display"></span></span>
                         <button onclick="selectButton(this, 'driver-awareness', 1)">1</button>
                         <button onclick="selectButton(this, 'driver-awareness', 2)">2</button>
@@ -238,19 +241,19 @@
             <div class="section" id="mobility">
                 <h2>MOBILITY</h2>
                 <div class="button-group">
-                    <div class="button-row">
+                    <div class="button-row" data-team="1">
                         <span>Team 1: <span id="team-number-1-display"></span></span>
                         <button onclick="selectButton(this, 'mobility', 1)">1</button>
                         <button onclick="selectButton(this, 'mobility', 2)">2</button>
                         <button onclick="selectButton(this, 'mobility', 3)">3</button>
                     </div>
-                    <div class="button-row">
+                    <div class="button-row" data-team="2">
                         <span>Team 2: <span id="team-number-2-display"></span></span>
                         <button onclick="selectButton(this, 'mobility', 1)">1</button>
                         <button onclick="selectButton(this, 'mobility', 2)">2</button>
                         <button onclick="selectButton(this, 'mobility', 3)">3</button>
                     </div>
-                    <div class="button-row">
+                    <div class="button-row" data-team="3">
                         <span>Team 3: <span id="team-number-3-display"></span></span>
                         <button onclick="selectButton(this, 'mobility', 1)">1</button>
                         <button onclick="selectButton(this, 'mobility', 2)">2</button>
@@ -261,19 +264,19 @@
             <div class="section" id="defense">
                 <h2>DEFENSE</h2>
                 <div class="button-group">
-                    <div class="button-row">
+                    <div class="button-row" data-team="1">
                         <span>Team 1: <span id="team-number-1-display"></span></span>
                         <button onclick="selectButton(this, 'defense', 1)">1</button>
                         <button onclick="selectButton(this, 'defense', 2)">2</button>
                         <button onclick="selectButton(this, 'defense', 3)">3</button>
                     </div>
-                    <div class="button-row">
+                    <div class="button-row" data-team="2">
                         <span>Team 2: <span id="team-number-2-display"></span></span>
                         <button onclick="selectButton(this, 'defense', 1)">1</button>
                         <button onclick="selectButton(this, 'defense', 2)">2</button>
                         <button onclick="selectButton(this, 'defense', 3)">3</button>
                     </div>
-                    <div class="button-row">
+                    <div class="button-row" data-team="3">
                         <span>Team 3: <span id="team-number-3-display"></span></span>
                         <button onclick="selectButton(this, 'defense', 1)">1</button>
                         <button onclick="selectButton(this, 'defense', 2)">2</button>
@@ -284,17 +287,17 @@
             <div class="section" id="human-player-awareness">
                 <h2>HUMAN PLAYER AWARENESS</h2>
                 <div class="button-group">
-                    <div class="button-row">
+                    <div class="button-row" data-team="1">
                         <span>Team 1: <span id="team-number-1-display"></span></span>
                         <button onclick="selectButton(this, 'human-player-awareness', 1)">1</button>
                         <button onclick="selectButton(this, 'human-player-awareness', 2)">2</button>
                     </div>
-                    <div class="button-row">
+                    <div class="button-row" data-team="2">
                         <span>Team 2: <span id="team-number-2-display"></span></span>
                         <button onclick="selectButton(this, 'human-player-awareness', 1)">1</button>
                         <button onclick="selectButton(this, 'human-player-awareness', 2)">2</button>
                     </div>
-                    <div class="button-row">
+                    <div class="button-row" data-team="3">
                         <span>Team 3: <span id="team-number-3-display"></span></span>
                         <button onclick="selectButton(this, 'human-player-awareness', 1)">1</button>
                         <button onclick="selectButton(this, 'human-player-awareness', 2)">2</button>
@@ -303,52 +306,81 @@
                 <button id="restart-button" style="margin-top: 10px;">Restart Selections</button>
             </div>
             <div class="section" id="scoring">
-                <h2>ALGAE NET SCORING</h2>
-                <div class="input-group">
-                    <label>Successfully Scored</label>
-                    <div>
-                        <button class="counter-button" onclick="decrementValue('successfully-scored')">-</button>
-                        <input type="number" id="successfully-scored" readonly>
-                        <button class="counter-button" onclick="incrementValue('successfully-scored')">+</button>
-                    </div>
-                    <label>Total Attempts</label>
-                    <div>
-                        <button class="counter-button" onclick="decrementValue('total-attempts')">-</button>
-                        <input type="number" id="total-attempts" readonly>
-                        <button class="counter-button" onclick="incrementValue('total-attempts')">+</button>
-                    </div>
-                    <label>Success Rate</label>
-                    <input type="text" id="success-rate" readonly>
+            <h2>ALGAE NET SCORING</h2>
+            <div class="input-group">
+                <label>Successfully Scored</label>
+                <div>
+                    <button class="counter-button" onclick="decrementValue('successfully-scored')">-</button>
+                    <input type="number" id="successfully-scored" readonly>
+                    <button class="counter-button" onclick="incrementValue('successfully-scored')">+</button>
                 </div>
+                <label>Total Attempts</label>
+                <div>
+                    <button class="counter-button" onclick="decrementValue('total-attempts')">-</button>
+                    <input type="number" id="total-attempts" readonly>
+                    <button class="counter-button" onclick="incrementValue('total-attempts')">+</button>
+                </div>
+                <label>Success Rate</label>
+                <input type="text" id="success-rate" readonly>
             </div>
         </div>
+    </div>
 <script>
-// Moved functions to top for better organization
-function getSectionData(sectionId) {
-    const section = document.getElementById(sectionId);
-    const buttons = section.querySelectorAll('.button-group button');
-    const selectedValues = [];
+document.getElementById("qrcode-button").addEventListener("click", async function(event) {
+            event.preventDefault();
+            
+            try {
+                const schema = await loadSchemaFromYaml('/schema/pit_scout_schema.yml');
+                const matchNumber = localStorage.getItem("matchNumber") || "N/A";
 
-    buttons.forEach(button => {
-        if (button.classList.contains('active')) {
-            selectedValues.push(button.textContent);
+                const dataToStore = {
+                    matchNumber: parseInt(matchNumber),
+                    driverAwareness: getSectionData('driver-awareness'),
+                    mobility: getSectionData('mobility'),
+                    defense: getSectionData('defense'),
+                    humanPlayerAwareness: getHumanPlayerData(),
+                    algaeNetScoring: {
+                        teamNumber: document.getElementById("algae-net-score").textContent
+                                     .replace("Team Number Chosen: ", "") || "N/A",
+                        successfullyScored: parseInt(document.getElementById("successfully-scored").value),
+                        totalAttempts: parseInt(document.getElementById("total-attempts").value)
+                    },
+                    teamNumbers: {
+                        team1: localStorage.getItem("teamNumber1"),
+                        team2: localStorage.getItem("teamNumber2"),
+                        team3: localStorage.getItem("teamNumber3")
+                    },
+                    timestamp: new Date().toISOString()
+                };
+
+                const encodedData = encodeQr(dataToStore, schema);
+                localStorage.setItem("currentQRData", encodedData);
+                window.location.href = "qr_display.html";
+
+            } catch (error) {
+                console.error("QR Generation Failed:", error);
+                alert(`Error: ${error.message}`);
+            }
+        });
+
+        // DATA COLLECTION FUNCTIONS
+        function getSectionData(sectionId) {
+            const section = document.getElementById(sectionId);
+            return {
+                team1: parseInt(section.querySelector('[data-team="1"] button.active')?.textContent) || 0,
+                team2: parseInt(section.querySelector('[data-team="2"] button.active')?.textContent) || 0,
+                team3: parseInt(section.querySelector('[data-team="3"] button.active')?.textContent) || 0
+            };
         }
-    });
 
-    return {
-        selected: selectedValues,
-        teamNumber: localStorage.getItem(`teamNumber${sectionId.charAt(sectionId.length - 1)}`) || "N/A"
-    };
-}
-
-function getHumanPlayerData() {
-    const section = document.getElementById('human-player-awareness');
-    const activeButtons = section.querySelectorAll('.active');
-    return Array.from(activeButtons).map(button => ({
-        team: button.closest('.button-row').querySelector('span').textContent.replace('Team ', ''),
-        rating: button.textContent
-    }));
-}
+        function getHumanPlayerData() {
+            const section = document.getElementById('human-player-awareness');
+            const activeButtons = section.querySelectorAll('.active');
+            return {
+                team1: parseInt(activeButtons[0]?.textContent) || 0,
+                team2: parseInt(activeButtons[1]?.textContent) || 0
+            };
+        }
 
 // QR Code Handler
 document.getElementById("qrcode-button").addEventListener("click", function(event) {
