@@ -1,4 +1,4 @@
-import pako from 'https://cdn.jsdelivr.net/npm/pako@2.1.0/+esm';
+import pako from 'https://cdn.skypack.dev/pako@2.1.0';
 import jsYaml from 'https://cdn.skypack.dev/js-yaml@4.2.0';
 
 export async function loadSchemaFromYaml(yamlUrl) {
@@ -6,6 +6,7 @@ export async function loadSchemaFromYaml(yamlUrl) {
     const yamlText = await response.text();
     return jsYaml.load(yamlText).schema;
 }
+
 
 function flattenObject(data, schema) {
     const result = [];
