@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Display</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         /* Add your existing styles here */
         body {
@@ -33,19 +34,18 @@
     </div>
     <a href="https://sirpercivalpercival.github.io/Super_Scout/" class="pit-scout-button">Return to Main Page</a>
 
-    <script>
-        // Get stored data
-        const data = JSON.parse(localStorage.getItem("currentQRData") || "{}");
-        
-        // Generate QR Code
-        new QRCode(document.getElementById("qrcode"), {
-            text: JSON.stringify(data),
-            width: 256,
-            height: 256,
-            colorDark: "#000000",
-            colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.H
-        });
+     <script>
+        const encodedData = localStorage.getItem("currentQRData");
+        if (encodedData) {
+            new QRious({
+                element: document.getElementById('qr-code'),
+                value: encodedData,
+                size: 400,
+                level: 'H'
+            });
+        } else {
+            document.body.innerHTML = '<p>No QR data found. Please generate one first.</p>';
+        }
     </script>
 </body>
 </html>
