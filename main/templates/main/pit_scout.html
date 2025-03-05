@@ -10,11 +10,19 @@
     <script src="https://cdn.jsdelivr.net/npm/base45-js@3.0.0/dist/base45.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
-    <script type="module" src="/static/js/qrcode_convert.js"></script>
+    <script type="module" src="../../../static/js/qrcode_convert.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script type="module">
+  import { encodeQr } from '../../../static/js/qrcode_convert.js';
+
+  // Make it available globally if needed
+  window.encodeQr = encodeQr;
+    import pako from 'https://cdn.jsdelivr.net/npm/pako@2.1.0/+esm';
+    import jsYaml from 'https://cdn.jsdelivr.net/npm/js-yaml@4.2.0/dist/js-yaml.mjs';
+</script>
     
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="static\styles.css">
+    <link rel="stylesheet" href="../../../static/styles.css">
     <style>
         
         body {
@@ -366,11 +374,9 @@ document.getElementById("qrcode-button").addEventListener("click", async functio
     event.preventDefault();
     
     try {
-        // Load the YAML schema
-        const schema = await loadSchemaFromYaml('/static/schema/pit_scout_schema.yml');
-
-        // Collect data from the form
+        const schema = await loadSchemaFromYaml('../../../static/schema/pit_scout_schema.yml');
         const matchNumber = localStorage.getItem("matchNumber") || "N/A";
+        
         const dataToStore = {
             matchNumber: parseInt(matchNumber),
             driverAwareness: getSectionData('driver-awareness'),
@@ -390,13 +396,12 @@ document.getElementById("qrcode-button").addEventListener("click", async functio
                 team3: localStorage.getItem("teamNumber3")
             },
             timestamp: new Date().toISOString()
-        };
+         };
 
-        // Encode data (e.g., using MessagePack or Base45)
-        const encodedData = msgpack.encode(dataToStore); // Ensure msgpack is defined
+        // Use the encodeQr function from qrcode_convert.js
+        const encodedData = encodeQr(dataToStore, schema);
+        
         localStorage.setItem("currentQRData", encodedData);
-
-        // Redirect to QR display page
         window.location.href = "qr_display.html";
 
     } catch (error) {
