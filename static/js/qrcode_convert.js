@@ -1,3 +1,6 @@
+window.global = window;
+window.process = { env: {} };
+
 import pako from 'https://cdn.skypack.dev/pako@2.1.0';
 import jsYaml from 'https://cdn.skypack.dev/js-yaml@4.2.0';
 import msgpack from 'https://cdn.jsdelivr.net/npm/@msgpack/msgpack@2.8.0/+esm';
