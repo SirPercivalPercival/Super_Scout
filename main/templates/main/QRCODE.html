@@ -2,7 +2,10 @@
 <html>
 <head>
     <title>QR CODE</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@msgpack/msgpack@2.8.0/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/base45-js@3.0.0/dist/base45.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 </head>
 <body>
@@ -16,11 +19,87 @@
     </div>
 
     <script>
-        // Get the form element
-        const form = document.getElementById('pitScoutForm');
+        const qrcodeConverter = {
+            async loadSchema(url) {
+                const response = await fetch(url);
+                const yamlText = await response.text();
+                return jsyaml.load(yamlText).schema;
+            },
 
-        // Add an event listener to handle form submission
-        const compactData = {
+            flattenObject(data, schema) {
+                const result = [];
+                const properties = schema.properties || {};
+
+                for (const [key, prop] of Object.entries(properties)) {
+                    const dataType = prop.type;
+                    const childData = data[key];
+
+                    if (dataType === 'object') {
+                        const nested = this.flattenObject(childData || {}, prop);
+                        result.push(nested.length);
+                        result.push(...nested);
+                    } else if (dataType === 'array') {
+                        const processed = this.flattenArray(childData || [], prop.items || {});
+                        result.push(processed.length);
+                        result.push(...processed);
+                    } else if (prop.enum) {
+                        const index = prop.enum.indexOf(childData);
+                        result.push(index !== -1 ? index : -1);
+                        if (index === -1) result.push(childData);
+                    } else {
+                        result.push(childData);
+                    }
+                }
+                return result;
+            },
+
+            flattenArray(data, schema) {
+                const result = [];
+                const schemaType = schema.type;
+
+                for (const item of data) {
+                    if (schemaType === 'object') {
+                        const processed = this.flattenObject(item, schema);
+                        result.push(processed.length);
+                        result.push(...processed);
+                    } else if (schemaType === 'array') {
+                        const processed = this.flattenArray(item, schema.items || {});
+                        result.push(processed.length);
+                        result.push(...processed);
+                    } else if (schema.enum) {
+                        const index = schema.enum.indexOf(item);
+                        result.push(index !== -1 ? index : -1);
+                        if (index === -1) result.push(item);
+                    } else {
+                        result.push(item);
+                    }
+                }
+                return result;
+            },
+
+            encodeQr(data, schema) {
+                const flattened = this.flattenObject(data, schema);
+                const packed = msgpack.encode(flattened);
+                const compressed = pako.deflate(packed);
+                return base45.encode(compressed);
+            }
+        };
+
+        // Form handler
+        document.getElementById('pitScoutForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            try {
+                // Load schema (ensure this file exists in your schema directory)
+                const schema = await qrcodeConverter.loadSchema('/schema/pit_scout_schema.yml');
+                
+                // Get form data
+                const formData = new FormData(e.target);
+                const formObject = Object.fromEntries(formData.entries());
+
+                // Process form data into structured format
+                const structuredData = {
+        MatchNumber: parseInt(formObject.matchNumber),
         DriverAwareness: { // Driver Awareness
             team1: pitScoutData.driverAwareness.team1,
             team2: pitScoutData.driverAwareness.team2,
@@ -45,19 +124,23 @@
             Success: pitScoutData.algaeNetScoring.successfullyScored,
             Total: pitScoutData.algaeNetScoring.totalAttempts
         },
-        MatchNumber: pitScoutData.matchNumber // Match Number
     };
 
-    // Convert to compact JSON string
-    const formattedData = JSON.stringify(compactData);
+    const encodedData = qrcodeConverter.encodeQr(structuredData, schema);
 
-    // Generate QR code
-    const qr = new QRious({
-        element: document.getElementById('qr-code'),
-        value: formattedData,
-        size: 256
-    });
-});
+                // Generate QR code
+                new QRious({
+                    element: document.getElementById('qr-code'),
+                    value: encodedData,
+                    size: 256,
+                    level: 'H'
+                });
+
+            } catch (error) {
+                console.error('QR code generation failed:', error);
+                alert('Error generating QR code. Check console for details.');
+            }
+        });
     </script>
 </body>
 </html>
