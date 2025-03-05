@@ -9,9 +9,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@msgpack/msgpack@2.8.0/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/base45-js@3.0.0/dist/base45.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
     <script type="module" src="/static/js/qrcode_convert.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="static\styles.css">
     <style>
@@ -325,95 +326,65 @@
             </div>
         </div>
     </div>
+
+
+    <script>
+async function loadSchemaFromYaml(url) {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch schema: ${response.statusText}`);
+        }
+        const yamlText = await response.text();
+        const schema = jsyaml.load(yamlText); // Parse YAML text into a JavaScript object
+        return schema;
+    } catch (error) {
+        console.error("Error loading YAML schema:", error);
+        throw error;
+    }
+}
+    </script>
 <script>
 document.getElementById("qrcode-button").addEventListener("click", async function(event) {
-            event.preventDefault();
-            
-            try {
-                const schema = await loadSchemaFromYaml('/schema/pit_scout_schema.yml');
-                const matchNumber = localStorage.getItem("matchNumber") || "N/A";
-
-                const dataToStore = {
-                    matchNumber: parseInt(matchNumber),
-                    driverAwareness: getSectionData('driver-awareness'),
-                    mobility: getSectionData('mobility'),
-                    defense: getSectionData('defense'),
-                    humanPlayerAwareness: getHumanPlayerData(),
-                    algaeNetScoring: {
-                        teamNumber: document.getElementById("algae-net-score").textContent
-                                     .replace("Team Number Chosen: ", "") || "N/A",
-                        successfullyScored: parseInt(document.getElementById("successfully-scored").value),
-                        totalAttempts: parseInt(document.getElementById("total-attempts").value)
-                    },
-                    teamNumbers: {
-                        team1: localStorage.getItem("teamNumber1"),
-                        team2: localStorage.getItem("teamNumber2"),
-                        team3: localStorage.getItem("teamNumber3")
-                    },
-                    timestamp: new Date().toISOString()
-                };
-
-                const encodedData = encodeQr(dataToStore, schema);
-                localStorage.setItem("currentQRData", encodedData);
-                window.location.href = "qr_display.html";
-
-            } catch (error) {
-                console.error("QR Generation Failed:", error);
-                alert(`Error: ${error.message}`);
-            }
-        });
-
-        // DATA COLLECTION FUNCTIONS
-        function getSectionData(sectionId) {
-            const section = document.getElementById(sectionId);
-            return {
-                team1: parseInt(section.querySelector('[data-team="1"] button.active')?.textContent) || 0,
-                team2: parseInt(section.querySelector('[data-team="2"] button.active')?.textContent) || 0,
-                team3: parseInt(section.querySelector('[data-team="3"] button.active')?.textContent) || 0
-            };
-        }
-
-        function getHumanPlayerData() {
-            const section = document.getElementById('human-player-awareness');
-            const activeButtons = section.querySelectorAll('.active');
-            return {
-                team1: parseInt(activeButtons[0]?.textContent) || 0,
-                team2: parseInt(activeButtons[1]?.textContent) || 0
-            };
-        }
-
-// QR Code Handler
-document.getElementById("qrcode-button").addEventListener("click", function(event) {
     event.preventDefault();
-
-    const matchNumber = localStorage.getItem("matchNumber") || "N/A";
-    const dataToStore = {
-        driverAwareness: getSectionData('driver-awareness'),
-        mobility: getSectionData('mobility'),
-        defense: getSectionData('defense'),
-        humanPlayerAwareness: getHumanPlayerData(),
-        algaeNetScoring: {
-            teamNumber: document.getElementById("algae-net-score").textContent
-                         .replace("Team Number Chosen: ", "") || "N/A",
-            successfullyScored: document.getElementById("successfully-scored").value,
-            totalAttempts: document.getElementById("total-attempts").value,
-            successRate: document.getElementById("success-rate").value
-        },
-        teamNumbers: {
-            team1: localStorage.getItem("teamNumber1"),
-            team2: localStorage.getItem("teamNumber2"),
-            team3: localStorage.getItem("teamNumber3")
-        },
-        matchNumber: matchNumber,
-        timestamp: new Date().toISOString()
-    };
-
-    // Fix path escaping (important!)
-    window.location.href = "https://sirpercivalpercival.github.io/Super_Scout/main/templates/main/qr_display.html";  // Use forward slashes
-
-    // Optional: Add error handling
+    
     try {
-        const compressedData = msgpack.encode(dataToStore);
+        // Load the YAML schema
+        const schema = await loadSchemaFromYaml('/static/schema/pit_scout_schema.yml');
+
+        // Collect data from the form
+        const matchNumber = localStorage.getItem("matchNumber") || "N/A";
+        const dataToStore = {
+            matchNumber: parseInt(matchNumber),
+            driverAwareness: getSectionData('driver-awareness'),
+            mobility: getSectionData('mobility'),
+            defense: getSectionData('defense'),
+            humanPlayerAwareness: getHumanPlayerData(),
+            algaeNetScoring: {
+                teamNumber: document.getElementById("algae-net-score").textContent
+                             .replace("Team Number Chosen: ", "") || "N/A",
+                successfullyScored: parseInt(document.getElementById("successfully-scored").value),
+                totalAttempts: parseInt(document.getElementById("total-attempts").value),
+                successRate: document.getElementById("success-rate").value
+            },
+            teamNumbers: {
+                team1: localStorage.getItem("teamNumber1"),
+                team2: localStorage.getItem("teamNumber2"),
+                team3: localStorage.getItem("teamNumber3")
+            },
+            timestamp: new Date().toISOString()
+        };
+
+       
+        // }
+
+        // Encode data (e.g., using MessagePack or Base45)
+        const encodedData = msgpack.encode(dataToStore); // Ensure msgpack is defined
+
+        // Save data to localStorage
+        localStorage.setItem("currentQRData", encodedData);
+
+        // Save to QR code history
         const qrCodeHistory = JSON.parse(localStorage.getItem("qrCodeHistory") || "[]");
         qrCodeHistory.push({
             matchNumber: matchNumber,
@@ -421,14 +392,35 @@ document.getElementById("qrcode-button").addEventListener("click", function(even
             timestamp: new Date().toISOString()
         });
         localStorage.setItem("qrCodeHistory", JSON.stringify(qrCodeHistory));
-        localStorage.setItem("currentQRData", JSON.stringify(dataToStore));
+
+        // Redirect to QR display page
+        window.location.href = "qr_display.html";
+
     } catch (error) {
-        console.error("QR Code Generation Error:", error);
-        alert("Failed to generate QR code. Please check your data.");
+        console.error("QR Generation Failed:", error);
+        alert(`Error: ${error.message}`);
     }
 });
-</script>
 
+// DATA COLLECTION FUNCTIONS
+function getSectionData(sectionId) {
+    const section = document.getElementById(sectionId);
+    return {
+        team1: parseInt(section.querySelector('[data-team="1"] button.active')?.textContent) || 0,
+        team2: parseInt(section.querySelector('[data-team="2"] button.active')?.textContent) || 0,
+        team3: parseInt(section.querySelector('[data-team="3"] button.active')?.textContent) || 0
+    };
+}
+
+function getHumanPlayerData() {
+    const section = document.getElementById('human-player-awareness');
+    const activeButtons = section.querySelectorAll('.active');
+    return {
+        team1: parseInt(activeButtons[0]?.textContent) || 0,
+        team2: parseInt(activeButtons[1]?.textContent) || 0
+    };
+}
+</script>
 
 
     <script>
