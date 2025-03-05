@@ -1,12 +1,10 @@
-const jsYaml = require('js-yaml');
-const msgpack = require('@msgpack/msgpack');
-const base45 = require('base45-js');
-const zlib = require('zlib');
-const fs = require('fs');
+import pako from 'https://cdn.skypack.dev/pako@2.1.0';
+import jsYaml from 'https://cdn.jsdelivr.net/npm/js-yaml@4.2.0/dist/js-yaml.mjs';
 
-function loadSchemaFromYaml(yamlFile) {
-    const fileContents = fs.readFileSync(yamlFile, 'utf8');
-    return jsYaml.load(fileContents).schema;
+export async function loadSchemaFromYaml(yamlUrl) {
+    const response = await fetch(yamlUrl);
+    const yamlText = await response.text();
+    return jsYaml.load(yamlText).schema;
 }
 
 function flattenObject(data, schema) {
@@ -120,23 +118,17 @@ function unflattenArray(data, schema, startIdx, length) {
     return [result, idx];
 }
 
-function encodeQr(data, schema) {
+export function encodeQr(data, schema) {
     const flattened = flattenObject(data, schema);
     const packed = msgpack.encode(flattened);
-    const compressed = zlib.deflateSync(packed);
+    const compressed = pako.deflate(packed);
     return base45.encode(compressed);
 }
 
-function decodeQr(encoded, schema) {
+export function decodeQr(encoded, schema) {
     const decoded = base45.decode(encoded);
-    const decompressed = zlib.inflateSync(decoded);
+    const decompressed = pako.inflate(decoded);
     const unpacked = msgpack.decode(decompressed);
     const [result] = unflattenObject(unpacked, schema);
     return result;
 }
-
-module.exports = {
-    loadSchemaFromYaml,
-    encodeQr,
-    decodeQr
-};
