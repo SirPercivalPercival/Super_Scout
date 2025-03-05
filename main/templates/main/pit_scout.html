@@ -10,7 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/base45-js@3.0.0/dist/base45.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
-    <script type="module" src="/static/js/qrcode_convert.js"></script>
+    <script type="module" src="../../../static/js/qrcode_convert.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <script type="module">
@@ -24,7 +24,7 @@
     
     
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="../../../static/styles.css">
     <style>
         
         body {
@@ -376,7 +376,7 @@ document.getElementById("qrcode-button").addEventListener("click", async functio
     event.preventDefault();
     
     try {
-        const schema = await loadSchemaFromYaml('/static/schema/pit_scout_schema.yml');
+        const schema = await loadSchemaFromYaml('../../../static/schema/pit_scout_schema.yml');
         const dataToStore = {
             matchNumber: parseInt(matchNumber),
             driverAwareness: getSectionData('driver-awareness'),
