@@ -14,15 +14,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <script type="module">
-  import { encodeQr, loadSchemaFromYaml } from '../../../static/js/qrcode_convert.js';
+  import { encodeQr, loadSchemaFromYaml } from '../../../../static/js/qrcode_convert.js';
   
-  // Add to window object
   window.QrGenerator = {
     encodeQr,
     loadSchemaFromYaml
   };
 
-  // Add polyfill for Node.js globals
   window.global = window;
   window.process = { env: {} };
 </script>
