@@ -15,10 +15,10 @@ async function loadDependencies() {
                 window.jsYaml = await import('https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.mjs').then(m => m.default || m);
                 
                 // Load msgpack (MessagePack library)
-                window.msgpack = await import('https://cdn.jsdelivr.net/npm/@msgpack/msgpack@2.8.0/+esm').then(m => m.default || m);
+                window.msgpack = await import('https://cdn.jsdelivr.net/npm/@msgpack/msgpack@1.1.0/+esm').then(m => m.default || m);
                 
                 // Load base45 (Base45 encoding library)
-                window.base45 = await import('https://cdn.jsdelivr.net/npm/base45-js@3.0.0/dist/base45.min.js').then(m => m.default || m);
+                window.base45 = await import('https://cdn.jsdelivr.net/npm/base45-js@0.4.4/dist/base45.min.js').then(m => m.default || m);
                 
                 dependenciesLoaded = true;
                 console.log('Dependencies loaded successfully');
