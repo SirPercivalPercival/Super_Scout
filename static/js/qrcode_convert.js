@@ -113,15 +113,19 @@ window.encodeQr = function(data, schema, dataType) {
         console.log('Data to encode:', data);
         console.log('Schema:', schema);
 
+        // Flatten the data according to the schema
         const flattened = flattenObject(data, schema);
         console.log('Flattened data:', flattened);
 
+        // Pack the data using MessagePack
         const packed = window.msgpack.encode(flattened);
         console.log('Packed data:', packed);
 
+        // Compress the data using pako (zlib)
         const compressed = window.pako.deflate(packed);
         console.log('Compressed data:', compressed);
 
+        // Encode the data using Base45
         const encoded = base45Encode(compressed);
         console.log('Base45 encoded data:', encoded);
 
