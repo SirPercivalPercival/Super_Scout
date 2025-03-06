@@ -371,7 +371,7 @@ async function loadSchemaFromYaml(url) {
         }
         const yamlText = await response.text();
         console.log("YAML content:", yamlText);
-         = jsyaml.load(yamlText);
+        const schema = jsyaml.load(yamlText);
         return schema;
     } catch (error) {
         console.error("Error loading YAML schema:", error);
