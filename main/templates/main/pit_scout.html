@@ -412,7 +412,7 @@ document.getElementById("qrcode-button").addEventListener("click", async functio
         };
 
         // Use the encodeQr function from qrcode_convert.js
-        const encodedData = await window.QrGenerator.encodeQr(dataToStore, schema);
+        const encodedData = await window.QrGenerator.encodeQr(dataToStore, schema, "objective_data");
         localStorage.setItem("currentQRData", encodedData);
         
         window.location.href = "qr_display.html";
