@@ -14,7 +14,7 @@ urllib3==2.3.0
 django-pwa==1.0.10
 
 ﻿base45==0.4.4
-msgpack==1.1.0
+msgpack==0.1.26
 numpy==2.2.3
 opencv-python==4.11.0.86
 PyYAML==6.0.2
