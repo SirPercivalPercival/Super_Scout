@@ -5,7 +5,6 @@ async function loadDependencies() {
     window.pako = await import('https://cdn.skypack.dev/pako@2.1.0').then(m => m.default || m);
     window.jsYaml = await import('https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.mjs').then(m => m.default || m);
     window.msgpack = await import('https://cdn.jsdelivr.net/npm/@msgpack/msgpack@2.8.0/+esm').then(m => m.default || m);
-    window.base45 = await import('https://cdn.jsdelivr.net/npm/base45-js@3.0.0/dist/base45.min.js').then(m => m.default || m);
 
     console.log('Dependencies loaded successfully');
 }
@@ -29,17 +28,16 @@ window.encodeQr = function(data, schema) {
     const flattened = flattenObject(data, schema);
     const packed = window.msgpack.encode(flattened);
     const compressed = window.pako.deflate(packed);
-    return window.base45.encode(compressed);
+    return base45Encode(compressed);  // Use custom Base45 encoding
 };
 
 window.decodeQr = function(encoded, schema) {
-    const decoded = window.base45.decode(encoded);
+    const decoded = base45Decode(encoded);  // Use custom Base45 decoding
     const decompressed = window.pako.inflate(decoded);
     const unpacked = window.msgpack.decode(decompressed);
     const [result] = unflattenObject(unpacked, schema);
     return result;  // Ensure this is inside the function body
 };
-
 
 window.QrGenerator = {
     encodeQr: window.encodeQr,
@@ -161,5 +159,3 @@ function unflattenArray(data, schema, startIdx, length) {
     }
     return [result, idx];
 }
-
-   
