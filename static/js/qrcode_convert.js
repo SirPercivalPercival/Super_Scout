@@ -139,8 +139,4 @@ export function decodeQr(encoded, schema) {
     return result;
 }
 
-export {
-  encodeQr,
-  decodeQr,
-  loadSchemaFromYaml
-};
+
