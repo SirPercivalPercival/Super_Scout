@@ -1,19 +1,44 @@
 window.global = window;
 window.process = { env: {} };
 
-async function loadDependencies() {
-    window.pako = await import('https://cdn.skypack.dev/pako@2.1.0').then(m => m.default || m);
-    window.jsYaml = await import('https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.mjs').then(m => m.default || m);
-    window.msgpack = await import('https://cdn.jsdelivr.net/npm/@msgpack/msgpack@2.8.0/+esm').then(m => m.default || m);
+let dependenciesLoaded = false;
+let loadDependenciesPromise = null;
 
-    console.log('Dependencies loaded successfully');
+async function loadDependencies() {
+    if (!dependenciesLoaded) {
+        if (!loadDependenciesPromise) {
+            loadDependenciesPromise = (async () => {
+                window.pako = await import('https://cdn.skypack.dev/pako@2.1.0').then(m => m.default || m);
+                window.jsYaml = await import('https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.mjs').then(m => m.default || m);
+                window.msgpack = await import('https://cdn.jsdelivr.net/npm/@msgpack/msgpack@2.8.0/+esm').then(m => m.default || m);
+                dependenciesLoaded = true;
+                console.log('Dependencies loaded successfully');
+            })();
+        }
+        await loadDependenciesPromise;
+    }
 }
 
-loadDependencies().catch(err => console.error("Failed to load dependencies:", err));
+window.encodeQr = async function(data, schema) {
+    await loadDependencies();
+    const flattened = flattenObject(data, schema);
+    const packed = window.msgpack.encode(flattened);
+    const compressed = window.pako.deflate(packed);
+    return window.base45.encode(compressed);
+};
+
+window.decodeQr = async function(encoded, schema) {
+    await loadDependencies();
+    const decoded = window.base45.decode(encoded);
+    const decompressed = window.pako.inflate(decoded);
+    const unpacked = window.msgpack.decode(decompressed);
+    const [result] = unflattenObject(unpacked, schema);
+    return result;
+};
 
 window.loadSchemaFromYaml = async function(yamlUrl) {
+    await loadDependencies();
     try {
-        console.log("Fetching schema from:", yamlUrl);
         const response = await fetch(yamlUrl);
         if (!response.ok) throw new Error(`Failed to fetch schema: ${response.statusText}`);
         const yamlText = await response.text();
@@ -22,22 +47,6 @@ window.loadSchemaFromYaml = async function(yamlUrl) {
         console.error("Error loading YAML schema:", error);
         return null;
     }
-};
-
-window.encodeQr = function(data, schema) {
-    const flattened = flattenObject(data, schema);
-    const packed = window.msgpack.encode(flattened);
-    const compressed = window.pako.deflate(packed);
-    return window.base45.encode(compressed);
-};
-
-window.decodeQr = function(encoded, schema) {
-    const decoded = window.base45.decode(encoded);
-
-    const decompressed = window.pako.inflate(decoded);
-    const unpacked = window.msgpack.decode(decompressed);
-    const [result] = unflattenObject(unpacked, schema);
-    return result;  // Ensure this is inside the function body
 };
 
 window.QrGenerator = {
