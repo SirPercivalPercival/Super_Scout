@@ -6,19 +6,18 @@
     <title>Pit Scout</title>
     <link rel="manifest" href="static\manifest.json">
     <meta name="theme-color" content="#00ffff">
-    <script src="https://cdn.jsdelivr.net/npm/@msgpack/msgpack@2.8.0/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/base45-js@3.0.0/dist/base45.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@msgpack/msgpack@2.8.0/dist/index.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+    <script src="/Super_Scout/static/js/qrcode_convert.js"></script>
     
 <script>
     console.log('QrGenerator:', window.QrGenerator);
     console.log('encodeQr exists:', typeof window.QrGenerator?.encodeQr === 'function');
 </script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
-   <script src="/Super_Scout/static/js/qrcode_convert.js"></script>
+    
 <script>
     console.log('QrGenerator:', window.QrGenerator);
     console.log('encodeQr exists:', typeof window.QrGenerator?.encodeQr === 'function');
@@ -349,6 +348,11 @@
     
     
 <script>
+console.log("msgpack:", window.msgpack);
+console.log("pako:", window.pako);
+console.log("jsYaml:", window.jsYaml);
+console.log("QrGenerator:", window.QrGenerator);
+console.log("encodeQr type:", typeof window.QrGenerator?.encodeQr);
 console.log('encodeQr type:', typeof encodeQr);
 console.log('loadSchemaFromYaml type:', typeof loadSchemaFromYaml);
 
@@ -373,8 +377,24 @@ async function loadSchemaFromYaml(url) {
     }
 }
 
+    async function ensureQrGeneratorReady() {
+        for (let i = 0; i < 10; i++) {  // Retry up to 10 times
+            if (window.QrGenerator && typeof window.QrGenerator.encodeQr === 'function') {
+                console.log('QrGenerator is ready.');
+                return;
+            }
+            console.log('Waiting for QrGenerator to load...');
+            await new Promise(resolve => setTimeout(resolve, 500));  // Wait 500ms before retrying
+        }
+        console.error('QrGenerator failed to load.');
+        alert('QR Code generator is not ready yet. Please try again later.');
+    }
+
+    ensureQrGeneratorReady();
+
 document.getElementById("qrcode-button").addEventListener("click", async function(event) {
     event.preventDefault();
+    await ensureQrGeneratorReady();
     
     try {
         const matchNumber = localStorage.getItem("matchNumber") || "N/A";
@@ -406,6 +426,10 @@ document.getElementById("qrcode-button").addEventListener("click", async functio
             },
             timestamp: new Date().toISOString()
         };
+
+        if (!window.QrGenerator || typeof window.QrGenerator.encodeQr !== 'function') {
+                throw new Error("QR Code generator is not initialized.");
+            }
 
         // Use the encodeQr function from qrcode_convert.js
         const encodedData = await window.QrGenerator.encodeQr(dataToStore, schema);
