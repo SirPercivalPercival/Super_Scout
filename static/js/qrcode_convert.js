@@ -280,4 +280,4 @@ function unflattenArray(data, schema, startIdx, length) {
         }
     }
     return [result, idx];
-}ndow.loadSchemaFromYaml === 'function');
+}ndow.loadSchemaFromYaml === 'function';
