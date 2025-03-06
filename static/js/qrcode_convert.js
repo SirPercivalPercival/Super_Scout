@@ -159,3 +159,4 @@ function unflattenArray(data, schema, startIdx, length) {
     }
     return [result, idx];
 }
+export { encodeQr, decodeQr, loadSchemaFromYaml };
