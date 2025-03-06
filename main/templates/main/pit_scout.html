@@ -13,19 +13,21 @@
     <script type="module" src="../../../static/js/qrcode_convert.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-    <script type="module">
+   <script type="module">
   import { encodeQr, loadSchemaFromYaml } from '../../../static/js/qrcode_convert.js';
+  
+  // Add debug logging
+  console.log('Module loaded:', { encodeQr, loadSchemaFromYaml });
   
   window.QrGenerator = {
     encodeQr,
     loadSchemaFromYaml
   };
 
+  // Add polyfill
   window.global = window;
   window.process = { env: {} };
 </script>
-
-    
   
       
      
@@ -376,7 +378,7 @@ document.getElementById("qrcode-button").addEventListener("click", async functio
         const matchNumber = localStorage.getItem("matchNumber") || "N/A";
         
         // Use the window object reference
-        const schema = await window.QrGenerator.loadSchemaFromYaml('../../../static/schema/pit_scout_schema.yml');
+        const schema = await window.QrGenerator.loadSchemaFromYaml('/Super_Scout/static/schema/pit_scout_schema.yml');
         const dataToStore = {
             matchNumber: parseInt(matchNumber) || 0, // Handle NaN cases
             // Rest of your data object
@@ -780,6 +782,10 @@ function getHumanPlayerData() {
 console.log('QrGenerator exists:', !!window.QrGenerator);
 console.log('encodeQr exists:', !!window.QrGenerator?.encodeQr);
 console.log('loadSchemaFromYaml exists:', !!window.QrGenerator?.loadSchemaFromYaml);
+console.log('LocalStorage contents:', JSON.stringify(localStorage));
+if (!localStorage.getItem("teamNumber1")) {
+  console.warn('No team numbers in localStorage');
+}
 
 window.addEventListener('beforeunload', function() {
         // Reset scoring data in localStorage
