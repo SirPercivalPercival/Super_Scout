@@ -159,4 +159,11 @@ function unflattenArray(data, schema, startIdx, length) {
     }
     return [result, idx];
 }
-export { encodeQr, decodeQr, loadSchemaFromYaml };
+window.QrGenerator = {
+    encodeQr: window.encodeQr,
+    decodeQr: window.decodeQr,
+    loadSchemaFromYaml: window.loadSchemaFromYaml
+};
+
+console.log('encodeQr exists:', typeof window.encodeQr === 'function');
+console.log('loadSchemaFromYaml exists:', typeof window.loadSchemaFromYaml === 'function');
