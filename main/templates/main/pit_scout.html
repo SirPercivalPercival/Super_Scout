@@ -386,7 +386,8 @@ document.getElementById("qrcode-button").addEventListener("click", async functio
         const matchNumber = localStorage.getItem("matchNumber") || "N/A";
         
         // Use the window object reference
-        const schema = await window.QrGenerator.loadSchemaFromYaml('/Super_Scout/static/schema/pit_scout_schema.yml');
+        const schema = await window.QrGenerator.loadSchemaFromYaml('https://sirpercivalpercival.github.io/Super_Scout/static/schema/pit_scout_schema.yml');
+
 
         const dataToStore = {
             matchNumber: parseInt(matchNumber) || 0, // Handle NaN cases
