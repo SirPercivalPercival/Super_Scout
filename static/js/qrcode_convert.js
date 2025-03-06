@@ -1,5 +1,6 @@
-import base45 from 'https://cdn.jsdelivr.net/npm/base45-js@3.0.0/lib/base45.min.js';
-import msgpack from 'https://cdn.jsdelivr.net/npm/@msgpack/msgpack@2.8.0/dist/index.umd.js';
+// Import dependencies
+import 'package:base45/base45.dart';
+import 'package:msgpack_dart/msgpack_dart.dart';
 import pako from 'https://cdn.skypack.dev/pako@2.1.0';
 import jsYaml from 'https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.mjs';
 
@@ -9,33 +10,52 @@ window.msgpack = msgpack;
 window.pako = pako;
 window.jsYaml = jsYaml;
 
-// Define QrGenerator
-window.QrGenerator = {
-  encodeQr: async function(data, schema) {
-    const flattened = flattenObject(data, schema);
-    const packed = msgpack.encode(flattened);
-    const compressed = pako.deflate(packed);
-    return base45.encode(compressed);
-  },
-  decodeQr: async function(encoded, schema) {
-    const decoded = base45.decode(encoded);
-    const decompressed = pako.inflate(decoded);
-    const unpacked = msgpack.decode(decompressed);
-    const [result] = unflattenObject(unpacked, schema);
-    return result;
-  },
-  loadSchemaFromYaml: async function(yamlUrl) {
-    try {
-      const response = await fetch(yamlUrl);
-      if (!response.ok) throw new Error(`Failed to fetch schema: ${response.statusText}`);
-      const yamlText = await response.text();
-      return jsYaml.load(yamlText);
-    } catch (error) {
-      console.error("Error loading YAML schema:", error);
-      return null;
-    }
+// Define encodeQr
+window.encodeQr = async function(data, schema) {
+  const flattened = flattenObject(data, schema);
+  const packed = msgpack.encode(flattened);
+  const compressed = pako.deflate(packed);
+  return base45.encode(compressed);
+};
+
+// Define decodeQr
+window.decodeQr = async function(encoded, schema) {
+  const decoded = base45.decode(encoded);
+  const decompressed = pako.inflate(decoded);
+  const unpacked = msgpack.decode(decompressed);
+  const [result] = unflattenObject(unpacked, schema);
+  return result;
+};
+
+// Define loadSchemaFromYaml
+window.loadSchemaFromYaml = async function(yamlUrl) {
+  try {
+    const response = await fetch(yamlUrl);
+    if (!response.ok) throw new Error(`Failed to fetch schema: ${response.statusText}`);
+    const yamlText = await response.text();
+    return jsYaml.load(yamlText);
+  } catch (error) {
+    console.error("Error loading YAML schema:", error);
+    return null;
   }
 };
+
+// Attach QrGenerator to global scope
+window.QrGenerator = {
+  encodeQr: window.encodeQr,
+  decodeQr: window.decodeQr,
+  loadSchemaFromYaml: window.loadSchemaFromYaml
+};
+
+// Debugging: Check if everything is loaded
+console.log('Base45 loaded:', !!window.base45);
+console.log('MessagePack loaded:', !!window.msgpack);
+console.log('Pako loaded:', !!window.pako);
+console.log('jsYaml loaded:', !!window.jsYaml);
+console.log('encodeQr loaded:', !!window.encodeQr);
+console.log('decodeQr loaded:', !!window.decodeQr);
+console.log('loadSchemaFromYaml loaded:', !!window.loadSchemaFromYaml);
+console.log('QrGenerator loaded:', !!window.QrGenerator);
 
 // Helper functions (unchanged)
 function flattenObject(data, schema) {
