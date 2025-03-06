@@ -60,7 +60,7 @@
 
             // Save the QR code data to history
             const matchNumber = localStorage.getItem("matchNumber") || "N/A";
-            const qrCodeHistory = JSON.parse(localStorage.getItem("qrCodeHistory") || []; // Fixed missing parenthesis
+            const qrCodeHistory = JSON.parse(localStorage.getItem("qrCodeHistory") || "[]"); // Fixed missing parenthesis
             qrCodeHistory.push({
                 matchNumber: matchNumber,
                 data: encodedData,
