@@ -138,3 +138,9 @@ export function decodeQr(encoded, schema) {
     const [result] = unflattenObject(unpacked, schema);
     return result;
 }
+
+export {
+  encodeQr,
+  decodeQr,
+  loadSchemaFromYaml
+};
