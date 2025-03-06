@@ -1,10 +1,15 @@
 window.global = window;
 window.process = { env: {} };
 
-window.pako = await import('https://cdn.skypack.dev/pako@2.1.0');
-window.jsYaml = await import('https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.mjs');
-window.msgpack = await import('https://cdn.jsdelivr.net/npm/@msgpack/msgpack@2.8.0/+esm');
-window.base45 = await import('https://cdn.jsdelivr.net/npm/base45-js@3.0.0/dist/base45.min.js');
+async function loadDependencies() {
+    window.pako = await import('https://cdn.skypack.dev/pako@2.1.0');
+    window.jsYaml = await import('https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.mjs');
+    window.msgpack = await import('https://cdn.jsdelivr.net/npm/@msgpack/msgpack@2.8.0/+esm');
+    window.base45 = await import('https://cdn.jsdelivr.net/npm/base45-js@3.0.0/dist/base45.min.js');
+}
+
+loadDependencies();
+
 
 export async function loadSchemaFromYaml(yamlUrl) {
     const response = await fetch(yamlUrl);
