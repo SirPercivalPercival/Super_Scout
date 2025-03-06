@@ -14,13 +14,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <script type="module">
-      import { encodeQr } from '../../../static/js/qrcode_convert.js';
+      import { encodeQr, loadSchemaFromYaml } from '../../../static/js/qrcode_convert.js';
   
       window.encodeQr = encodeQr;
-        window.loadSchemaFromYaml = loadSchemaFromYaml;
-      import pako from 'https://cdn.jsdelivr.net/npm/pako@2.1.0/+esm';
-    import jsYaml from 'https://cdn.jsdelivr.net/npm/js-yaml@4.2.0/dist/js-yaml.mjs';
+      window.loadSchemaFromYaml = loadSchemaFromYaml;
+  
+      // Add polyfill for global
+      window.global = window;
     </script>
+    
+  
     
     
     
@@ -339,22 +342,8 @@
     </div>
 
 
-    <script>
-async function loadSchemaFromYaml(url) {
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch schema: ${response.statusText}`);
-        }
-        const yamlText = await response.text();
-        const schema = jsyaml.load(yamlText); // Parse YAML text into a JavaScript object
-        return schema;
-    } catch (error) {
-        console.error("Error loading YAML schema:", error);
-        throw error;
-    }
-}
-    </script>
+    
+    
 <script>
 async function loadSchemaFromYaml(url) {
     try {
@@ -377,9 +366,14 @@ document.getElementById("qrcode-button").addEventListener("click", async functio
     event.preventDefault();
     
     try {
+        // First get the match number from localStorage
+        const matchNumber = localStorage.getItem("matchNumber") || "N/A";
+        
+        // Then use it in your data object
         const schema = await loadSchemaFromYaml('../../../static/schema/pit_scout_schema.yml');
         const dataToStore = {
-            matchNumber: parseInt(matchNumber),
+            matchNumber: parseInt(matchNumber) || 0, // Handle NaN cases
+            // Rest of your data object
             driverAwareness: getSectionData('driver-awareness'),
             mobility: getSectionData('mobility'),
             defense: getSectionData('defense'),
@@ -397,13 +391,13 @@ document.getElementById("qrcode-button").addEventListener("click", async functio
                 team3: localStorage.getItem("teamNumber3")
             },
             timestamp: new Date().toISOString()
-         };
+        };
 
         // Use the encodeQr function from qrcode_convert.js
         const encodedData = window.encodeQr(dataToStore, schema);
         localStorage.setItem("currentQRData", encodedData);
-        
         window.location.href = "qr_display.html";
+
     } catch (error) {
         console.error("QR Generation Failed:", error);
         alert(`Error: ${error.message}`);
