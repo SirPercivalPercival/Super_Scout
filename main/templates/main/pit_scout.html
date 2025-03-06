@@ -18,23 +18,10 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-   <script type="module">
-  import QrGenerator from '/Super_Scout/static/js/qrcode_convert.js';
-  const { encodeQr, loadSchemaFromYaml } = QrGenerator;
-
-
-  
-  // Add debug logging
-  console.log('Module loaded:', { encodeQr, loadSchemaFromYaml });
-  
-  window.QrGenerator = {
-    encodeQr,
-    loadSchemaFromYaml
-  };
-
-  // Add polyfill
-  window.global = window;
-  window.process = { env: {} };
+   <script src="/Super_Scout/static/js/qrcode_convert.js"></script>
+<script>
+    console.log('QrGenerator:', window.QrGenerator);
+    console.log('encodeQr exists:', typeof window.QrGenerator?.encodeQr === 'function');
 </script>
   
       
