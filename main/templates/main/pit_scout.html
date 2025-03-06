@@ -14,14 +14,23 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <script type="module">
-      import { encodeQr, loadSchemaFromYaml } from '../../../static/js/qrcode_convert.js';
+  import { encodeQr, loadSchemaFromYaml } from '../../../static/js/qrcode_convert.js';
   
-      window.encodeQr = encodeQr;
-      window.loadSchemaFromYaml = loadSchemaFromYaml;
+  // Add to window object
+  window.QrGenerator = {
+    encodeQr,
+    loadSchemaFromYaml
+  };
+
+  // Add polyfill for Node.js globals
+  window.global = window;
+  window.process = { env: {} };
+</script>
+
+    
   
-      // Add polyfill for global
-      window.global = window;
-    </script>
+      
+     
     
   
     
@@ -366,11 +375,10 @@ document.getElementById("qrcode-button").addEventListener("click", async functio
     event.preventDefault();
     
     try {
-        // First get the match number from localStorage
         const matchNumber = localStorage.getItem("matchNumber") || "N/A";
         
-        // Then use it in your data object
-        const schema = await loadSchemaFromYaml('../../../static/schema/pit_scout_schema.yml');
+        // Use the window object reference
+        const schema = await window.QrGenerator.loadSchemaFromYaml('../../../static/schema/pit_scout_schema.yml');
         const dataToStore = {
             matchNumber: parseInt(matchNumber) || 0, // Handle NaN cases
             // Rest of your data object
@@ -394,10 +402,10 @@ document.getElementById("qrcode-button").addEventListener("click", async functio
         };
 
         // Use the encodeQr function from qrcode_convert.js
-        const encodedData = window.encodeQr(dataToStore, schema);
+        const encodedData = window.QrGenerator.encodeQr(dataToStore, schema);
         localStorage.setItem("currentQRData", encodedData);
+        
         window.location.href = "qr_display.html";
-
     } catch (error) {
         console.error("QR Generation Failed:", error);
         alert(`Error: ${error.message}`);
