@@ -4,13 +4,26 @@ window.process = { env: {} };
 import pako from 'https://cdn.skypack.dev/pako@2.1.0';
 import jsYaml from 'https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.mjs';
 import msgpack from 'https://cdn.jsdelivr.net/npm/@msgpack/msgpack@2.8.0/+esm';
-import base45 from 'https://cdn.jsdelivr.net/npm/base45-js@3.0.0/lib/browser.js';
+import base45 from 'https://cdn.jsdelivr.net/npm/base45-js@3.0.0/dist/base45.min.js';
 export async function loadSchemaFromYaml(yamlUrl) {
     const response = await fetch(yamlUrl);
     const yamlText = await response.text();
     return jsYaml.load(yamlText).schema;
 }
 
+try {
+  window.global = window;
+  window.process = { env: {} };
+  
+  import pako from 'https://cdn.skypack.dev/pako@2.1.0';
+  import jsYaml from 'https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.mjs';
+  import msgpack from 'https://cdn.jsdelivr.net/npm/@msgpack/msgpack@2.8.0/+esm';
+  import base45 from 'https://cdn.jsdelivr.net/npm/base45-js@3.0.0/dist/base45.min.js';
+
+  console.log('Dependencies loaded successfully');
+} catch (error) {
+  console.error('Failed to load dependencies:', error);
+}
 
 function flattenObject(data, schema) {
     const result = [];
