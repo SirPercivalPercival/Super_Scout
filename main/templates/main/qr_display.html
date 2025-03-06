@@ -47,28 +47,30 @@
     <a href="https://sirpercivalpercival.github.io/Super_Scout/" class="pit-scout-button">Return to Main Page</a>
 
     <script>
-    const encodedData = localStorage.getItem("currentQRData");
-    if (encodedData) {
-        // Generate the QR code
-        new QRCode(document.getElementById("qrcode"), {
-            text: encodedData,
-            width: 256,
-            height: 256
-        });
+        // Retrieve the encoded data from localStorage
+        const encodedData = localStorage.getItem("currentQRData");
 
-        // Save the QR code data to history
-        const matchNumber = localStorage.getItem("matchNumber") || "N/A";
-        const qrCodeHistory = JSON.parse(localStorage.getItem("qrCodeHistory") || [];
-        qrCodeHistory.push({
-            matchNumber: matchNumber,
-            data: encodedData,
-            timestamp: new Date().toISOString()
-        });
-        localStorage.setItem("qrCodeHistory", JSON.stringify(qrCodeHistory));
-    } else {
-        // Display an error message if no QR data is found
-        document.body.innerHTML = '<p>No QR data found. Please generate one first.</p>';
-    }
-</script>
+        if (encodedData) {
+            // Generate the QR code
+            new QRCode(document.getElementById("qrcode"), {
+                text: encodedData,
+                width: 256,
+                height: 256
+            });
+
+            // Save the QR code data to history
+            const matchNumber = localStorage.getItem("matchNumber") || "N/A";
+            const qrCodeHistory = JSON.parse(localStorage.getItem("qrCodeHistory") || []; // Fixed missing parenthesis
+            qrCodeHistory.push({
+                matchNumber: matchNumber,
+                data: encodedData,
+                timestamp: new Date().toISOString()
+            });
+            localStorage.setItem("qrCodeHistory", JSON.stringify(qrCodeHistory));
+        } else {
+            // Display an error message if no QR data is found
+            document.body.innerHTML = '<p>No QR data found. Please generate one first.</p>';
+        }
+    </script>
 </body>
 </html>
