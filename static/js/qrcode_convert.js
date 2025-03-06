@@ -28,11 +28,12 @@ window.encodeQr = function(data, schema) {
     const flattened = flattenObject(data, schema);
     const packed = window.msgpack.encode(flattened);
     const compressed = window.pako.deflate(packed);
-    return base45Encode(compressed);  // Use custom Base45 encoding
+    return window.base45.encode(compressed);
 };
 
 window.decodeQr = function(encoded, schema) {
-    const decoded = base45Decode(encoded);  // Use custom Base45 decoding
+    const decoded = window.base45.decode(encoded);
+
     const decompressed = window.pako.inflate(decoded);
     const unpacked = window.msgpack.decode(decompressed);
     const [result] = unflattenObject(unpacked, schema);
