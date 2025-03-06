@@ -37,8 +37,9 @@ window.decodeQr = function(encoded, schema) {
     const decompressed = window.pako.inflate(decoded);
     const unpacked = window.msgpack.decode(decompressed);
     const [result] = unflattenObject(unpacked, schema);
-    return result;
+    return result;  // Ensure this is inside the function body
 };
+
 
 window.QrGenerator = {
     encodeQr: window.encodeQr,
@@ -161,11 +162,4 @@ function unflattenArray(data, schema, startIdx, length) {
     return [result, idx];
 }
 
-    window.decodeQr = function(encoded, schema) {
-    const decoded = window.base45.decode(encoded);
-    const decompressed = window.pako.inflate(decoded);
-    const unpacked = window.msgpack.decode(decompressed);
-    const [result] = unflattenObject(unpacked, schema);
-    return result;  // Ensure this is inside the function body
-};
-
+   
