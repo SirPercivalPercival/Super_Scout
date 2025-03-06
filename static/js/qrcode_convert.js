@@ -1,15 +1,23 @@
 window.global = window;
 window.process = { env: {} };
 
-import pako from 'https://cdn.skypack.dev/pako@2.1.0';
-import jsYaml from 'https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.mjs';
-import msgpack from 'https://cdn.jsdelivr.net/npm/@msgpack/msgpack@2.8.0/+esm';
-import base45 from 'https://cdn.jsdelivr.net/npm/base45-js@3.0.0/dist/base45.min.js';
+window.pako = await import('https://cdn.skypack.dev/pako@2.1.0');
+window.jsYaml = await import('https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.mjs');
+window.msgpack = await import('https://cdn.jsdelivr.net/npm/@msgpack/msgpack@2.8.0/+esm');
+window.base45 = await import('https://cdn.jsdelivr.net/npm/base45-js@3.0.0/dist/base45.min.js');
+
 export async function loadSchemaFromYaml(yamlUrl) {
     const response = await fetch(yamlUrl);
     const yamlText = await response.text();
     return jsYaml.load(yamlText).schema;
 }
+
+
+window.QrGenerator = {
+    encodeQr,
+    loadSchemaFromYaml
+};
+
 
 try {
   window.global = window;
@@ -24,6 +32,44 @@ try {
 } catch (error) {
   console.error('Failed to load dependencies:', error);
 }
+console.log('encodeQr exists:', typeof window.encodeQr === 'function');
+console.log('loadSchemaFromYaml exists:', typeof window.loadSchemaFromYaml === 'function');
+
+window.loadSchemaFromYaml = async function(yamlUrl) {
+    try {
+        console.log("Fetching schema from:", yamlUrl);
+        const response = await fetch(yamlUrl);
+        if (!response.ok) throw new Error(`Failed to fetch schema: ${response.statusText}`);
+        const yamlText = await response.text();
+        console.log("YAML content:", yamlText);
+        return window.jsYaml.load(yamlText);
+    } catch (error) {
+        console.error("Error loading YAML schema:", error);
+        return null;
+    }
+};
+
+window.encodeQr = function(data, schema) {
+    const flattened = flattenObject(data, schema);
+    const packed = window.msgpack.encode(flattened);
+    const compressed = window.pako.deflate(packed);
+    return window.base45.encode(compressed);
+};
+
+window.decodeQr = function(encoded, schema) {
+    const decoded = window.base45.decode(encoded);
+    const decompressed = window.pako.inflate(decoded);
+    const unpacked = window.msgpack.decode(decompressed);
+    const [result] = unflattenObject(unpacked, schema);
+    return result;
+};
+
+// Attach functions to `window.QrGenerator`
+window.QrGenerator = {
+    encodeQr: window.encodeQr,
+    loadSchemaFromYaml: window.loadSchemaFromYaml
+};
+
 
 function flattenObject(data, schema) {
     const result = [];
