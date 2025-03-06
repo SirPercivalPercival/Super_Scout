@@ -428,9 +428,9 @@ document.getElementById("qrcode-button").addEventListener("click", async functio
 function getSectionData(sectionId) {
     const section = document.getElementById(sectionId);
     return {
-        localStorage.getItem("teamNumber1"): parseInt(section.querySelector('[data-team="1"] button.active')?.textContent) || 0,
-        localStorage.getItem("teamNumber2"): parseInt(section.querySelector('[data-team="2"] button.active')?.textContent) || 0,
-        localStorage.getItem("teamNumber3"): parseInt(section.querySelector('[data-team="3"] button.active')?.textContent) || 0
+        team1: parseInt(section.querySelector('[data-team="1"] button.active')?.textContent) || 0,
+        team2: parseInt(section.querySelector('[data-team="2"] button.active')?.textContent) || 0,
+        team3: parseInt(section.querySelector('[data-team="3"] button.active')?.textContent) || 0
     };
 }
 
