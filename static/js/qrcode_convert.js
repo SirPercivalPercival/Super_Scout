@@ -2,43 +2,15 @@ window.global = window;
 window.process = { env: {} };
 
 async function loadDependencies() {
-    window.pako = await import('https://cdn.skypack.dev/pako@2.1.0');
-    window.jsYaml = await import('https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.mjs');
-    window.msgpack = await import('https://cdn.jsdelivr.net/npm/@msgpack/msgpack@2.8.0/+esm');
-    window.base45 = await import('https://cdn.jsdelivr.net/npm/base45-js@3.0.0/dist/base45.min.js');
+    window.pako = await import('https://cdn.skypack.dev/pako@2.1.0').then(m => m.default || m);
+    window.jsYaml = await import('https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.mjs').then(m => m.default || m);
+    window.msgpack = await import('https://cdn.jsdelivr.net/npm/@msgpack/msgpack@2.8.0/+esm').then(m => m.default || m);
+    window.base45 = await import('https://cdn.jsdelivr.net/npm/base45-js@3.0.0/dist/base45.min.js').then(m => m.default || m);
+
+    console.log('Dependencies loaded successfully');
 }
 
-loadDependencies();
-
-
-export async function loadSchemaFromYaml(yamlUrl) {
-    const response = await fetch(yamlUrl);
-    const yamlText = await response.text();
-    return jsYaml.load(yamlText).schema;
-}
-
-
-window.QrGenerator = {
-    encodeQr,
-    loadSchemaFromYaml
-};
-
-
-try {
-  window.global = window;
-  window.process = { env: {} };
-  
-  import pako from 'https://cdn.skypack.dev/pako@2.1.0';
-  import jsYaml from 'https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.mjs';
-  import msgpack from 'https://cdn.jsdelivr.net/npm/@msgpack/msgpack@2.8.0/+esm';
-  import base45 from 'https://cdn.jsdelivr.net/npm/base45-js@3.0.0/dist/base45.min.js';
-
-  console.log('Dependencies loaded successfully');
-} catch (error) {
-  console.error('Failed to load dependencies:', error);
-}
-console.log('encodeQr exists:', typeof window.encodeQr === 'function');
-console.log('loadSchemaFromYaml exists:', typeof window.loadSchemaFromYaml === 'function');
+loadDependencies().catch(err => console.error("Failed to load dependencies:", err));
 
 window.loadSchemaFromYaml = async function(yamlUrl) {
     try {
@@ -46,7 +18,6 @@ window.loadSchemaFromYaml = async function(yamlUrl) {
         const response = await fetch(yamlUrl);
         if (!response.ok) throw new Error(`Failed to fetch schema: ${response.statusText}`);
         const yamlText = await response.text();
-        console.log("YAML content:", yamlText);
         return window.jsYaml.load(yamlText);
     } catch (error) {
         console.error("Error loading YAML schema:", error);
@@ -69,13 +40,16 @@ window.decodeQr = function(encoded, schema) {
     return result;
 };
 
-// Attach functions to `window.QrGenerator`
 window.QrGenerator = {
     encodeQr: window.encodeQr,
+    decodeQr: window.decodeQr,
     loadSchemaFromYaml: window.loadSchemaFromYaml
 };
 
+console.log('encodeQr exists:', typeof window.encodeQr === 'function');
+console.log('loadSchemaFromYaml exists:', typeof window.loadSchemaFromYaml === 'function');
 
+// Helper functions (unchanged)
 function flattenObject(data, schema) {
     const result = [];
     const properties = schema.properties || {};
@@ -187,15 +161,6 @@ function unflattenArray(data, schema, startIdx, length) {
     return [result, idx];
 }
 
-export function encodeQr(data, schema) {
-    const flattened = flattenObject(data, schema);
-    const packed = msgpack.encode(flattened);
-    const compressed = pako.deflate(packed);
-    return base45.encode(compressed);
-}
-
-export function decodeQr(encoded, schema) {
-    const decoded = base45.decode(encoded);
     const decompressed = pako.inflate(decoded);
     const unpacked = msgpack.decode(decompressed);
     const [result] = unflattenObject(unpacked, schema);
