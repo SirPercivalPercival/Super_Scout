@@ -2,10 +2,9 @@ window.global = window;
 window.process = { env: {} };
 
 import pako from 'https://cdn.skypack.dev/pako@2.1.0';
-import jsYaml from 'https://cdn.skypack.dev/js-yaml@4.2.0';
+import jsYaml from 'https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.mjs';
 import msgpack from 'https://cdn.jsdelivr.net/npm/@msgpack/msgpack@2.8.0/+esm';
-import base45 from 'https://cdn.jsdelivr.net/npm/base45-js@3.0.0/+esm';
-
+import base45 from 'https://cdn.jsdelivr.net/npm/base45-js@3.0.0/lib/browser.js';
 export async function loadSchemaFromYaml(yamlUrl) {
     const response = await fetch(yamlUrl);
     const yamlText = await response.text();
