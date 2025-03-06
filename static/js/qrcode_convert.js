@@ -1,3 +1,20 @@
+
+import base45 from 'https://cdn.jsdelivr.net/npm/base45-js@3.0.0/lib/base45.min.js';
+
+// Import MessagePack
+import msgpack from 'https://cdn.jsdelivr.net/npm/@msgpack/msgpack@2.8.0/dist/index.umd.js';
+
+// Import pako (compression library)
+import pako from 'https://cdn.skypack.dev/pako@2.1.0';
+
+// Import js-yaml (YAML parsing library)
+import jsYaml from 'https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.mjs';
+
+window.base45 = base45;
+window.msgpack = msgpack;
+window.pako = pako;
+window.jsYaml = jsYaml;
+
 window.global = window;
 window.process = { env: {} };
 
