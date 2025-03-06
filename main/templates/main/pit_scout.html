@@ -10,7 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/base45-js@3.0.0/dist/base45.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
-    <script src="../../../static/js/qrcode_convert.js"></script>
+    
 <script>
     console.log('QrGenerator:', window.QrGenerator);
     console.log('encodeQr exists:', typeof window.QrGenerator?.encodeQr === 'function');
@@ -379,10 +379,12 @@ document.getElementById("qrcode-button").addEventListener("click", async functio
     try {
         const matchNumber = localStorage.getItem("matchNumber") || "N/A";
         
-        // Use the window object reference
-        const schema = await window.QrGenerator.loadSchemaFromYaml('https://sirpercivalpercival.github.io/Super_Scout/static/schema/pit_scout_schema.yml');
+        // Load schema
+        const schema = await window.QrGenerator.loadSchemaFromYaml(
+            'https://sirpercivalpercival.github.io/Super_Scout/static/schema/pit_scout_schema.yml'
+        );
 
-
+        // Prepare data
         const dataToStore = {
             matchNumber: parseInt(matchNumber) || 0, // Handle NaN cases
             // Rest of your data object
@@ -406,7 +408,7 @@ document.getElementById("qrcode-button").addEventListener("click", async functio
         };
 
         // Use the encodeQr function from qrcode_convert.js
-        const encodedData = window.QrGenerator.encodeQr(dataToStore, schema);
+        const encodedData = await window.QrGenerator.encodeQr(dataToStore, schema);
         localStorage.setItem("currentQRData", encodedData);
         
         window.location.href = "qr_display.html";
