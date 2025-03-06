@@ -8,9 +8,18 @@ async function loadDependencies() {
     if (!dependenciesLoaded) {
         if (!loadDependenciesPromise) {
             loadDependenciesPromise = (async () => {
+                // Load pako (compression library)
                 window.pako = await import('https://cdn.skypack.dev/pako@2.1.0').then(m => m.default || m);
+                
+                // Load js-yaml (YAML parsing library)
                 window.jsYaml = await import('https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.mjs').then(m => m.default || m);
+                
+                // Load msgpack (MessagePack library)
                 window.msgpack = await import('https://cdn.jsdelivr.net/npm/@msgpack/msgpack@2.8.0/+esm').then(m => m.default || m);
+                
+                // Load base45 (Base45 encoding library)
+                window.base45 = await import('https://cdn.jsdelivr.net/npm/base45-js@3.0.0/dist/base45.min.js').then(m => m.default || m);
+                
                 dependenciesLoaded = true;
                 console.log('Dependencies loaded successfully');
             })();
@@ -169,11 +178,3 @@ function unflattenArray(data, schema, startIdx, length) {
     }
     return [result, idx];
 }
-window.QrGenerator = {
-    encodeQr: window.encodeQr,
-    decodeQr: window.decodeQr,
-    loadSchemaFromYaml: window.loadSchemaFromYaml
-};
-
-console.log('encodeQr exists:', typeof window.encodeQr === 'function');
-console.log('loadSchemaFromYaml exists:', typeof window.loadSchemaFromYaml === 'function');
