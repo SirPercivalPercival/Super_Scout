@@ -354,6 +354,13 @@
     
     
 <script>
+console.log('encodeQr type:', typeof encodeQr);
+console.log('loadSchemaFromYaml type:', typeof loadSchemaFromYaml);
+
+window.QrGenerator = {
+  encodeQr,
+  loadSchemaFromYaml
+};
 async function loadSchemaFromYaml(url) {
     try {
         console.log("Fetching schema from:", url);
