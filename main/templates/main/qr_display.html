@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Display</title>
+    <!-- Use qrcode.min.js for QR code generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         /* Add your existing styles here */
         body {
@@ -16,6 +16,7 @@
             min-height: 100vh;
             background-color: rgb(0, 217, 255);
             font-family: 'Bebas Neue', sans-serif;
+            margin: 0;
         }
         .qr-container {
             background: white;
@@ -25,6 +26,17 @@
         }
         .pit-scout-button {
             margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        .pit-scout-button:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
@@ -34,16 +46,19 @@
     </div>
     <a href="https://sirpercivalpercival.github.io/Super_Scout/" class="pit-scout-button">Return to Main Page</a>
 
-     <script>
+    <script>
+        // Retrieve the encoded data from localStorage
         const encodedData = localStorage.getItem("currentQRData");
+
         if (encodedData) {
-            new QRious({
-                element: document.getElementById('qr-code'),
-                value: encodedData,
-                size: 400,
-                level: 'H'
+            // Generate the QR code using qrcode.min.js
+            new QRCode(document.getElementById("qrcode"), {
+                text: encodedData,
+                width: 256,
+                height: 256
             });
         } else {
+            // Display an error message if no QR data is found
             document.body.innerHTML = '<p>No QR data found. Please generate one first.</p>';
         }
     </script>
